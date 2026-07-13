@@ -32,9 +32,17 @@ export default function ZzzApp() {
 
   return (
     <div className="min-h-screen bg-[#F0F0F0] text-[#333333] font-sans antialiased flex flex-col items-center justify-start py-24 px-6 selection:bg-[#E0E0E0]">
-      <header className="mb-20 text-center tracking-widest">
-        <h1 className="text-xl font-light text-[#666666] select-none">ZZZ</h1>
-      </header>
+      <header className="mb-20 text-center tracking-widest space-y-6">
+  <h1 className="text-xl font-light text-[#666666] select-none">ZZZ</h1>
+
+  <div className="text-xs leading-7 text-[#888888] tracking-wide font-light max-w-xs mx-auto">
+    <p>ZZZは、眠る前の小さなひとことを</p>
+    <p>匿名の気配として置いていく場所です。</p>
+    <p>1日1回、15文字以内の「うとうと」を投稿できます。</p>
+    <p>誰かの投稿には、ただ静かに zzz を送れます。</p>
+  </div>
+</header>
+
 
       <main className="w-full max-w-md space-y-24">
         <section className="space-y-4">
