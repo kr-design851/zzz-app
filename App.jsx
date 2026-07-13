@@ -61,20 +61,36 @@ export default function ZzzApp() {
   const fetchPosts = async () => {
     setLoading(true);
 
-    const { data, error } = await supabase
+    await supabase.rpc('hide_expired_posts');
+
+    const { data: timelineData, error: timelineError } = await supabase
       .from('posts')
       .select('*')
+      .eq('is_hidden', false)
       .order('created_at', { ascending: false })
       .limit(20);
 
-    if (error) {
-      console.error(error);
+    if (timelineError) {
+      console.error(timelineError);
       setLoading(false);
       return;
     }
 
-    setTimeline(data || []);
-    setMyPosts((data || []).filter((post) => post.user_id === userId));
+    const { data: myPostsData, error: myPostsError } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (myPostsError) {
+      console.error(myPostsError);
+      setLoading(false);
+      return;
+    }
+
+    setTimeline(timelineData || []);
+    setMyPosts(myPostsData || []);
     setLoading(false);
   };
 
@@ -85,7 +101,8 @@ export default function ZzzApp() {
     const { error } = await supabase.from('posts').insert({
       name: currentUser,
       text: utouto,
-      user_id: userId
+      user_id: userId,
+      is_hidden: false
     });
 
     if (error) {
@@ -180,7 +197,7 @@ export default function ZzzApp() {
             <p>眠る前の小さなひとことを</p>
             <p>匿名の気配として置いていく場所。</p>
             <p>1日1回、15文字以内の「うとうと」。</p>
-            <p>誰かには、静かに zzz を送れます。</p>
+            <p>7時間以内に zzz が3つ届くと、まどろみに残ります。</p>
           </div>
         </div>
 
@@ -259,7 +276,7 @@ export default function ZzzApp() {
                 </p>
               ) : timeline.length === 0 ? (
                 <p className="text-xs text-[#7CA7BE] text-center tracking-wider">
-                  まだ、まどろみはありません。
+                  いま見える、まどろみはありません。
                 </p>
               ) : (
                 <div className="space-y-5">
@@ -322,22 +339,36 @@ export default function ZzzApp() {
                 {myPosts.map((post) => (
                   <article
                     key={post.id}
-                    className="border-2 border-[#37516B] bg-[#0D1422]/90 p-5 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)]"
+                    className={`border-2 bg-[#0D1422]/90 p-5 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)] ${
+                      post.is_hidden
+                        ? 'border-[#5F4B6B] opacity-75'
+                        : 'border-[#37516B]'
+                    }`}
                   >
                     <p className="text-lg tracking-wider text-[#E8F8FF]">
                       {post.text}
                     </p>
+
+                    {post.is_hidden && (
+                      <p className="mt-3 text-[10px] text-[#FFB8EF] tracking-wider">
+                        まどろみから、消えました
+                      </p>
+                    )}
+
+                    {!post.is_hidden && (post.zzz_count || 0) >= 3 && (
+                      <p className="mt-3 text-[10px] text-[#FFED70] tracking-wider">
+                        まどろみに、残りました
+                      </p>
+                    )}
 
                     <div className="mt-4 text-xs text-[#7CA7BE] flex justify-center gap-4">
                       <span>
                         {new Date(post.created_at).toLocaleDateString('ja-JP')}
                       </span>
 
-                      {(post.zzz_count || 0) > 0 && (
-                        <span className="text-[#FFED70]">
-                          zzz {post.zzz_count}
-                        </span>
-                      )}
+                      <span className="text-[#FFED70]">
+                        zzz {post.zzz_count || 0}
+                      </span>
                     </div>
 
                     <button
