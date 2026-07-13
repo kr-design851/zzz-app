@@ -169,21 +169,6 @@ export default function ZzzApp() {
     fetchPosts();
   };
 
-  const getRemainingText = (createdAt) => {
-    const created = new Date(createdAt).getTime();
-    const limit = created + 7 * 60 * 60 * 1000;
-    const now = Date.now();
-    const diff = limit - now;
-
-    if (diff <= 0) return 'まもなく消えます';
-
-    const hours = Math.floor(diff / (60 * 60 * 1000));
-    const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
-
-    if (hours <= 0) return `あと${minutes}分`;
-    return `あと${hours}時間${minutes}分`;
-  };
-
   const PageButton = ({ value, children }) => (
     <button
       type="button"
@@ -236,16 +221,6 @@ export default function ZzzApp() {
               {new Date(post.created_at).toLocaleDateString('ja-JP')}
             </span>
           )}
-
-          {!mine && (
-            <span className="text-[#66759D]">
-              {getRemainingText(post.created_at)}
-            </span>
-          )}
-
-          <span className="text-[#FFF0A8]">
-            zzz {zzzCount} / 3
-          </span>
         </div>
 
         {!mine && (
