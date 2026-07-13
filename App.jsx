@@ -102,6 +102,28 @@ export default function ZzzApp() {
   };
 
   const handleZzz = async (postId) => {
+    const handleDeletePost = async (postId) => {
+  const ok = window.confirm('このうとうとを消しますか？');
+
+  if (!ok) return;
+
+  const { error } = await supabase.rpc('delete_my_post', {
+    p_post_id: postId,
+    p_user_id: userId
+  });
+
+  if (error) {
+    console.error(error);
+    alert('削除に失敗しました。少し時間をおいて試してください。');
+    return;
+  }
+
+  setTimeline((posts) => posts.filter((post) => post.id !== postId));
+  setMyPosts((posts) => posts.filter((post) => post.id !== postId));
+
+  fetchPosts();
+};
+
     if (zzzedPostIds.includes(postId)) return;
 
     const { error } = await supabase.rpc('increment_zzz', {
@@ -299,6 +321,36 @@ export default function ZzzApp() {
                     key={post.id}
                     className="border-2 border-[#37516B] bg-[#0D1422]/90 p-5 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)]"
                   >
+                    {myPosts.map((post) => (
+  <article
+    key={post.id}
+    className="border-2 border-[#37516B] bg-[#0D1422]/90 p-5 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)]"
+  >
+    <p className="text-lg tracking-wider text-[#E8F8FF]">
+      {post.text}
+    </p>
+
+    <div className="mt-4 text-xs text-[#7CA7BE] flex justify-center gap-4">
+      <span>
+        {new Date(post.created_at).toLocaleDateString('ja-JP')}
+      </span>
+
+      {(post.zzz_count || 0) > 0 && (
+        <span className="text-[#FFED70]">
+          zzz {post.zzz_count}
+        </span>
+      )}
+    </div>
+
+    <button
+      onClick={() => handleDeletePost(post.id)}
+      className="mt-5 border border-[#FF4FD8]/60 text-[#FFB8EF] px-3 py-1 text-xs hover:bg-[#2B1230] hover:shadow-[0_0_10px_rgba(255,79,216,0.4)]"
+    >
+      けす
+    </button>
+  </article>
+))}
+
                     <p className="text-lg tracking-wider text-[#E8F8FF]">
                       {post.text}
                     </p>
