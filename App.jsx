@@ -285,10 +285,10 @@ export default function ZzzApp() {
             </h1>
 
             <div className="mt-7 space-y-2 text-xs leading-7 tracking-wider text-[#BED0F8]">
-              <p>眠る前の小さなひとことを</p>
-              <p>匿名の気配として置いていく場所。</p>
-              <p>7時間以内に zzz が3つ届くと、</p>
-              <p>そのまどろみは、少しだけ残ります。</p>
+            <p>眠る前の小さなひとことを</p>
+            <p>匿名の気配として置いていく場所</p>
+            <p>1日1回、15文字以内の「うとうと」</p>
+            <p>誰かのうとうとには zzz を送れます</p>
             </div>
           </div>
 
