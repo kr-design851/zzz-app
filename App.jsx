@@ -162,7 +162,7 @@ export default function ZzzApp() {
   };
 
   const handleShare = async () => {
-    const shareUrl = window.location.origin;
+    const shareUrl = 'https://zzz-app-gray.vercel.app';
 
     const shareData = {
       title: 'ZZZ｜眠る前の小さなひとこと',
