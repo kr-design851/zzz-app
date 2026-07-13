@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const KEHAI_NAMES = [
   '深夜の人',
@@ -9,18 +14,13 @@ const KEHAI_NAMES = [
   '3階の人'
 ];
 
-const INITIAL_TIMELINE = [
-  { id: 1, name: '深夜の人', text: 'ココアが温かい', zzzCount: 5 },
-  { id: 2, name: '雨の日の人', text: '遠くで電車の音がする', zzzCount: 12 },
-  { id: 3, name: '牛乳の人', text: '冷蔵庫の音が大きいな', zzzCount: 3 },
-];
-
 export default function ZzzApp() {
   const [page, setPage] = useState('timeline');
-  const [timeline, setTimeline] = useState(INITIAL_TIMELINE);
+  const [timeline, setTimeline] = useState([]);
   const [myPosts, setMyPosts] = useState([]);
   const [utouto, setUtouto] = useState('');
   const [hasPosted, setHasPosted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [currentUser] = useState(() => {
     const savedName = localStorage.getItem('zzz-current-user');
@@ -31,14 +31,17 @@ export default function ZzzApp() {
     return newName;
   });
 
-  useEffect(() => {
-    const savedPosts = localStorage.getItem('zzz-my-posts');
+  const [userId] = useState(() => {
+    const savedUserId = localStorage.getItem('zzz-user-id');
+    if (savedUserId) return savedUserId;
 
-    if (savedPosts) {
-      const parsedPosts = JSON.parse(savedPosts);
-      setMyPosts(parsedPosts);
-      setTimeline([...parsedPosts, ...INITIAL_TIMELINE].slice(0, 20));
-    }
+    const newUserId = crypto.randomUUID();
+    localStorage.setItem('zzz-user-id', newUserId);
+    return newUserId;
+  });
+
+  useEffect(() => {
+    fetchPosts();
 
     const postedDate = localStorage.getItem('zzz-posted-date');
     const today = new Date().toDateString();
@@ -48,33 +51,51 @@ export default function ZzzApp() {
     }
   }, []);
 
-  const handlePost = (e) => {
+  const fetchPosts = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) {
+      console.error(error);
+      setLoading(false);
+      return;
+    }
+
+    setTimeline(data || []);
+    setMyPosts((data || []).filter((post) => post.user_id === userId));
+    setLoading(false);
+  };
+
+  const handlePost = async (e) => {
     e.preventDefault();
     if (!utouto.trim() || utouto.length > 15 || hasPosted) return;
 
-    const newPost = {
-      id: Date.now(),
+    const { error } = await supabase.from('posts').insert({
       name: currentUser,
       text: utouto,
-      createdAt: new Date().toLocaleDateString('ja-JP'),
-      zzzCount: 0,
-    };
+      user_id: userId
+    });
 
-    const updatedMyPosts = [newPost, ...myPosts];
-    const updatedTimeline = [newPost, ...timeline].slice(0, 20);
+    if (error) {
+      console.error(error);
+      alert('投稿に失敗しました。少し時間をおいて試してください。');
+      return;
+    }
 
-    setMyPosts(updatedMyPosts);
-    setTimeline(updatedTimeline);
     setUtouto('');
     setHasPosted(true);
-
-    localStorage.setItem('zzz-my-posts', JSON.stringify(updatedMyPosts));
     localStorage.setItem('zzz-posted-date', new Date().toDateString());
+
+    fetchPosts();
   };
 
   return (
     <div className="min-h-screen bg-[#F0F0F0] text-[#333333] font-sans antialiased flex flex-col items-center justify-start py-20 px-6 selection:bg-[#E0E0E0]">
-      
       <header className="mb-16 text-center tracking-widest space-y-6">
         <h1 className="text-xl font-light text-[#666666] select-none">ZZZ</h1>
 
@@ -102,7 +123,6 @@ export default function ZzzApp() {
       </header>
 
       <main className="w-full max-w-md space-y-20">
-        
         {page === 'timeline' && (
           <>
             <section className="space-y-4">
@@ -117,8 +137,8 @@ export default function ZzzApp() {
                   />
                   <div className="flex justify-between items-center text-xs text-[#999999] px-1">
                     <span>{utouto.length} / 15</span>
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       disabled={!utouto.trim()}
                       className="hover:text-[#333333] disabled:opacity-30 disabled:hover:text-[#999999] transition-colors"
                     >
@@ -134,28 +154,41 @@ export default function ZzzApp() {
             </section>
 
             <section className="space-y-12">
-              <h2 className="text-xs tracking-widest text-[#999999] text-center mb-8 select-none">まどろみ</h2>
-              <div className="space-y-10">
-                {timeline.map((post) => (
-                  <article key={post.id} className="flex flex-col items-center space-y-3 group">
-                    <p className="text-base tracking-wide font-light text-[#222222]">
-                      {post.text}
-                    </p>
-                    
-                    <div className="flex items-center space-x-4 text-xs text-[#999999] opacity-60 group-hover:opacity-100 transition-opacity">
-                      <span className="select-none font-light">{post.name}</span>
-                      <button
-                        onClick={() => {
-                          console.log(`zzz to ${post.id}`);
-                        }}
-                        className="hover:text-[#333333] transition-colors select-none font-medium tracking-tighter"
-                      >
-                        zzz
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
+              <h2 className="text-xs tracking-widest text-[#999999] text-center mb-8 select-none">
+                まどろみ
+              </h2>
+
+              {loading ? (
+                <p className="text-xs text-[#999999] text-center tracking-wider">
+                  よみこみ中...
+                </p>
+              ) : timeline.length === 0 ? (
+                <p className="text-xs text-[#999999] text-center tracking-wider">
+                  まだ、まどろみはありません。
+                </p>
+              ) : (
+                <div className="space-y-10">
+                  {timeline.map((post) => (
+                    <article key={post.id} className="flex flex-col items-center space-y-3 group">
+                      <p className="text-base tracking-wide font-light text-[#222222]">
+                        {post.text}
+                      </p>
+
+                      <div className="flex items-center space-x-4 text-xs text-[#999999] opacity-60 group-hover:opacity-100 transition-opacity">
+                        <span className="select-none font-light">{post.name}</span>
+                        <button
+                          onClick={() => {
+                            console.log(`zzz to ${post.id}`);
+                          }}
+                          className="hover:text-[#333333] transition-colors select-none font-medium tracking-tighter"
+                        >
+                          zzz
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
             </section>
           </>
         )}
@@ -178,7 +211,9 @@ export default function ZzzApp() {
                       {post.text}
                     </p>
                     <div className="text-xs text-[#999999] opacity-60">
-                      <span>{post.createdAt}</span>
+                      <span>
+                        {new Date(post.created_at).toLocaleDateString('ja-JP')}
+                      </span>
                     </div>
                   </article>
                 ))}
@@ -186,7 +221,6 @@ export default function ZzzApp() {
             )}
           </section>
         )}
-
       </main>
 
       <footer className="mt-32 text-[10px] text-[#BBBBBB] select-none tracking-widest">
