@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const KEHAI_NAMES = ['深夜の人', '雨の日の人', '牛乳の人', 'ベランダの人', 'ぬるいお茶の人', '3階の人'];
+const KEHAI_NAMES = [
+  '深夜の人',
+  '雨の日の人',
+  '牛乳の人',
+  'ベランダの人',
+  'ぬるいお茶の人',
+  '3階の人'
+];
 
 const INITIAL_TIMELINE = [
   { id: 1, name: '深夜の人', text: 'ココアが温かい', zzzCount: 5 },
@@ -9,10 +16,37 @@ const INITIAL_TIMELINE = [
 ];
 
 export default function ZzzApp() {
+  const [page, setPage] = useState('timeline');
   const [timeline, setTimeline] = useState(INITIAL_TIMELINE);
+  const [myPosts, setMyPosts] = useState([]);
   const [utouto, setUtouto] = useState('');
   const [hasPosted, setHasPosted] = useState(false);
-  const [currentUser] = useState(() => KEHAI_NAMES[Math.floor(Math.random() * KEHAI_NAMES.length)]);
+
+  const [currentUser] = useState(() => {
+    const savedName = localStorage.getItem('zzz-current-user');
+    if (savedName) return savedName;
+
+    const newName = KEHAI_NAMES[Math.floor(Math.random() * KEHAI_NAMES.length)];
+    localStorage.setItem('zzz-current-user', newName);
+    return newName;
+  });
+
+  useEffect(() => {
+    const savedPosts = localStorage.getItem('zzz-my-posts');
+
+    if (savedPosts) {
+      const parsedPosts = JSON.parse(savedPosts);
+      setMyPosts(parsedPosts);
+      setTimeline([...parsedPosts, ...INITIAL_TIMELINE].slice(0, 20));
+    }
+
+    const postedDate = localStorage.getItem('zzz-posted-date');
+    const today = new Date().toDateString();
+
+    if (postedDate === today) {
+      setHasPosted(true);
+    }
+  }, []);
 
   const handlePost = (e) => {
     e.preventDefault();
@@ -22,81 +56,137 @@ export default function ZzzApp() {
       id: Date.now(),
       name: currentUser,
       text: utouto,
+      createdAt: new Date().toLocaleDateString('ja-JP'),
       zzzCount: 0,
     };
 
-    setTimeline([newPost, ...timeline].slice(0, 20));
+    const updatedMyPosts = [newPost, ...myPosts];
+    const updatedTimeline = [newPost, ...timeline].slice(0, 20);
+
+    setMyPosts(updatedMyPosts);
+    setTimeline(updatedTimeline);
     setUtouto('');
     setHasPosted(true);
+
+    localStorage.setItem('zzz-my-posts', JSON.stringify(updatedMyPosts));
+    localStorage.setItem('zzz-posted-date', new Date().toDateString());
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F0F0] text-[#333333] font-sans antialiased flex flex-col items-center justify-start py-24 px-6 selection:bg-[#E0E0E0]">
-      <header className="mb-20 text-center tracking-widest space-y-6">
-  <h1 className="text-xl font-light text-[#666666] select-none">ZZZ</h1>
+    <div className="min-h-screen bg-[#F0F0F0] text-[#333333] font-sans antialiased flex flex-col items-center justify-start py-20 px-6 selection:bg-[#E0E0E0]">
+      
+      <header className="mb-16 text-center tracking-widest space-y-6">
+        <h1 className="text-xl font-light text-[#666666] select-none">ZZZ</h1>
 
-  <div className="text-xs leading-7 text-[#888888] tracking-wide font-light max-w-xs mx-auto">
-    <p>ZZZは、眠る前の小さなひとことを</p>
-    <p>匿名の気配として置いていく場所です。</p>
-    <p>1日1回、15文字以内の「うとうと」を投稿できます。</p>
-    <p>誰かの投稿には、ただ静かに zzz を送れます。</p>
-  </div>
-</header>
+        <div className="text-xs leading-7 text-[#888888] tracking-wide font-light max-w-xs mx-auto">
+          <p>ZZZは、眠る前の小さなひとことを</p>
+          <p>匿名の気配として置いていく場所です。</p>
+          <p>1日1回、15文字以内の「うとうと」を投稿できます。</p>
+          <p>誰かの投稿には、ただ静かに zzz を送れます。</p>
+        </div>
 
+        <nav className="flex justify-center gap-8 text-xs text-[#999999] pt-4">
+          <button
+            onClick={() => setPage('timeline')}
+            className={page === 'timeline' ? 'text-[#333333]' : 'hover:text-[#666666]'}
+          >
+            まどろみ
+          </button>
+          <button
+            onClick={() => setPage('mine')}
+            className={page === 'mine' ? 'text-[#333333]' : 'hover:text-[#666666]'}
+          >
+            わたし
+          </button>
+        </nav>
+      </header>
 
-      <main className="w-full max-w-md space-y-24">
-        <section className="space-y-4">
-          {!hasPosted ? (
-            <form onSubmit={handlePost} className="flex flex-col space-y-4">
-              <input
-                type="text"
-                value={utouto}
-                onChange={(e) => setUtouto(e.target.value.slice(0, 15))}
-                placeholder="うとうとを、15文字以内で"
-                className="w-full bg-transparent border-b border-[#CCCCCC] focus:border-[#666666] outline-none py-2 text-center text-sm placeholder-[#999999] tracking-wide transition-colors"
-              />
-              <div className="flex justify-between items-center text-xs text-[#999999] px-1">
-                <span>{utouto.length} / 15</span>
-                <button
-                  type="submit"
-                  disabled={!utouto.trim()}
-                  className="hover:text-[#333333] disabled:opacity-30 disabled:hover:text-[#999999] transition-colors"
-                >
-                  おくる
-                </button>
-              </div>
-            </form>
-          ) : (
-            <p className="text-xs text-[#999999] text-center italic tracking-wider select-none">
-              きょうの うとうと は、もうおわりました。あなたの気配：{currentUser}
-            </p>
-          )}
-        </section>
-
-        <section className="space-y-12">
-          <h2 className="text-xs tracking-widest text-[#999999] text-center mb-8 select-none">まどろみ</h2>
-          <div className="space-y-10">
-            {timeline.map((post) => (
-              <article key={post.id} className="flex flex-col items-center space-y-3 group">
-                <p className="text-base tracking-wide font-light text-[#222222]">
-                  {post.text}
+      <main className="w-full max-w-md space-y-20">
+        
+        {page === 'timeline' && (
+          <>
+            <section className="space-y-4">
+              {!hasPosted ? (
+                <form onSubmit={handlePost} className="flex flex-col space-y-4">
+                  <input
+                    type="text"
+                    value={utouto}
+                    onChange={(e) => setUtouto(e.target.value.slice(0, 15))}
+                    placeholder="うとうとを、15文字以内で"
+                    className="w-full bg-transparent border-b border-[#CCCCCC] focus:border-[#666666] outline-none py-2 text-center text-sm placeholder-[#999999] tracking-wide transition-colors"
+                  />
+                  <div className="flex justify-between items-center text-xs text-[#999999] px-1">
+                    <span>{utouto.length} / 15</span>
+                    <button 
+                      type="submit" 
+                      disabled={!utouto.trim()}
+                      className="hover:text-[#333333] disabled:opacity-30 disabled:hover:text-[#999999] transition-colors"
+                    >
+                      おくる
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <p className="text-xs text-[#999999] text-center italic tracking-wider select-none">
+                  きょうの うとうと は、もうおわりました。あなたの気配：{currentUser}
                 </p>
+              )}
+            </section>
 
-                <div className="flex items-center space-x-4 text-xs text-[#999999] opacity-60 group-hover:opacity-100 transition-opacity">
-                  <span className="select-none font-light">{post.name}</span>
-                  <button
-                    onClick={() => {
-                      console.log(`zzz to ${post.id}`);
-                    }}
-                    className="hover:text-[#333333] transition-colors select-none font-medium tracking-tighter"
-                  >
-                    zzz
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+            <section className="space-y-12">
+              <h2 className="text-xs tracking-widest text-[#999999] text-center mb-8 select-none">まどろみ</h2>
+              <div className="space-y-10">
+                {timeline.map((post) => (
+                  <article key={post.id} className="flex flex-col items-center space-y-3 group">
+                    <p className="text-base tracking-wide font-light text-[#222222]">
+                      {post.text}
+                    </p>
+                    
+                    <div className="flex items-center space-x-4 text-xs text-[#999999] opacity-60 group-hover:opacity-100 transition-opacity">
+                      <span className="select-none font-light">{post.name}</span>
+                      <button
+                        onClick={() => {
+                          console.log(`zzz to ${post.id}`);
+                        }}
+                        className="hover:text-[#333333] transition-colors select-none font-medium tracking-tighter"
+                      >
+                        zzz
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {page === 'mine' && (
+          <section className="space-y-12">
+            <h2 className="text-xs tracking-widest text-[#999999] text-center mb-8 select-none">
+              わたしのうとうと
+            </h2>
+
+            {myPosts.length === 0 ? (
+              <p className="text-xs text-[#999999] text-center tracking-wider">
+                まだ、うとうとはありません。
+              </p>
+            ) : (
+              <div className="space-y-10">
+                {myPosts.map((post) => (
+                  <article key={post.id} className="flex flex-col items-center space-y-3">
+                    <p className="text-base tracking-wide font-light text-[#222222]">
+                      {post.text}
+                    </p>
+                    <div className="text-xs text-[#999999] opacity-60">
+                      <span>{post.createdAt}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
       </main>
 
       <footer className="mt-32 text-[10px] text-[#BBBBBB] select-none tracking-widest">
