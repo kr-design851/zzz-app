@@ -102,34 +102,34 @@ export default function ZzzApp() {
   };
 
   const handleZzz = async (postId) => {
-    if (zzzedPostIds.includes(postId)) return;
+  if (zzzedPostIds.includes(postId)) return;
 
-    const updatedZzzedPostIds = [...zzzedPostIds, postId];
+  const { error } = await supabase.rpc('increment_zzz', {
+    p_post_id: postId
+  });
 
-    setZzzedPostIds(updatedZzzedPostIds);
-    localStorage.setItem('zzz-zzzed-post-ids', JSON.stringify(updatedZzzedPostIds));
+  if (error) {
+    console.error(error);
+    alert('zzzに失敗しました。少し時間をおいて試してください。');
+    return;
+  }
 
-    setTimeline((posts) =>
-      posts.map((post) =>
-        post.id === postId
-          ? { ...post, zzz_count: (post.zzz_count || 0) + 1 }
-          : post
-      )
-    );
+  const updatedZzzedPostIds = [...zzzedPostIds, postId];
 
-    const { error } = await supabase.rpc('increment_zzz', {
-  p_post_id: postId
-});
+  setZzzedPostIds(updatedZzzedPostIds);
+  localStorage.setItem('zzz-zzzed-post-ids', JSON.stringify(updatedZzzedPostIds));
 
+  setTimeline((posts) =>
+    posts.map((post) =>
+      post.id === postId
+        ? { ...post, zzz_count: (post.zzz_count || 0) + 1 }
+        : post
+    )
+  );
 
-    if (error) {
-      console.error(error);
-      alert('zzzに失敗しました。少し時間をおいて試してください。');
-      return;
-    }
+  fetchPosts();
+};
 
-    fetchPosts();
-  };
 
   return (
     <div className="min-h-screen bg-[#F0F0F0] text-[#333333] font-sans antialiased flex flex-col items-center justify-start py-20 px-6 selection:bg-[#E0E0E0]">
