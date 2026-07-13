@@ -201,11 +201,11 @@ export default function ZzzApp() {
           </div>
         </div>
 
-        <nav className="mt-6 grid grid-cols-2 gap-3 text-xs tracking-widest">
+        <nav className="mt-6 grid grid-cols-3 gap-2 text-xs tracking-widest">
           <button
             type="button"
             onClick={() => setPage('timeline')}
-            className={`border-2 px-4 py-3 transition-all ${
+            className={`border-2 px-2 py-3 transition-all ${
               page === 'timeline'
                 ? 'border-[#FF4FD8] text-[#FFB8EF] bg-[#2B1230] shadow-[0_0_14px_rgba(255,79,216,0.5)]'
                 : 'border-[#37516B] text-[#7CA7BE] bg-[#0D1422] hover:border-[#00E5FF]'
@@ -217,13 +217,25 @@ export default function ZzzApp() {
           <button
             type="button"
             onClick={() => setPage('mine')}
-            className={`border-2 px-4 py-3 transition-all ${
+            className={`border-2 px-2 py-3 transition-all ${
               page === 'mine'
                 ? 'border-[#FF4FD8] text-[#FFB8EF] bg-[#2B1230] shadow-[0_0_14px_rgba(255,79,216,0.5)]'
                 : 'border-[#37516B] text-[#7CA7BE] bg-[#0D1422] hover:border-[#00E5FF]'
             }`}
           >
             わたし
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPage('about')}
+            className={`border-2 px-2 py-3 transition-all ${
+              page === 'about'
+                ? 'border-[#FF4FD8] text-[#FFB8EF] bg-[#2B1230] shadow-[0_0_14px_rgba(255,79,216,0.5)]'
+                : 'border-[#37516B] text-[#7CA7BE] bg-[#0D1422] hover:border-[#00E5FF]'
+            }`}
+          >
+            zzzについて
           </button>
         </nav>
       </header>
@@ -382,6 +394,101 @@ export default function ZzzApp() {
                 ))}
               </div>
             )}
+          </section>
+        )}
+
+        {page === 'about' && (
+          <section className="space-y-5">
+            <h2 className="text-center text-xs tracking-[0.45em] text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]">
+              zzzについて
+            </h2>
+
+            <div className="border-2 border-[#37516B] bg-[#0D1422]/90 p-6 shadow-[6px_6px_0px_rgba(0,0,0,0.35)] space-y-6">
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  ここは、眠る前の置き場です
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  ZZZは、眠る前に浮かんだ小さなひとことを、
+                  匿名の「気配」として置いていく場所です。
+                  はっきりした日記でも、強い投稿でもなく、
+                  ただそこにある短いまどろみを集めています。
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  投稿は1日1回、15文字まで
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  投稿できる「うとうと」は、1日1回だけです。
+                  文字数は15文字以内。
+                  長く説明しすぎないことで、
+                  眠る前の一瞬の気配だけが残るようにしています。
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  名前はランダムな気配名です
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  投稿者の名前は表示されません。
+                  かわりに「深夜の人」「雨の日の人」のような
+                  気配名が自動でつきます。
+                  誰かを強く主張するのではなく、
+                  なんとなく誰かがいる感じを大切にしています。
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  zzzは、静かなリアクションです
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  誰かのうとうとに、言葉で返すことはできません。
+                  そのかわりに、静かに zzz を送れます。
+                  zzz は「わかる」「そこにいるよ」くらいの、
+                  小さな合図です。
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  7時間以内にzzzが3つ届くと残ります
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  投稿から7時間以内に zzz が3つ以上届くと、
+                  その投稿は「まどろみ」に残ります。
+                  3つ届かなかった投稿は、
+                  みんなの画面から静かに消えていきます。
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  消えても、自分だけは見返せます
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  まどろみから消えた投稿も、
+                  投稿した本人の「わたし」ページには残ります。
+                  みんなの場所からは消えても、
+                  自分の眠る前の記録としては見返せます。
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-[#FFED70] text-sm tracking-widest">
+                  これはまだ小さな実験です
+                </h3>
+                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
+                  ZZZは、深夜のコンビニの前にあるような、
+                  少し光っていて、少しさみしい場所を目指しています。
+                  正しいことを言う場所ではなく、
+                  眠る前の気配を置いていくための小さな実験です。
+                </p>
+              </div>
+            </div>
           </section>
         )}
       </main>
