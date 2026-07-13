@@ -169,333 +169,314 @@ export default function ZzzApp() {
     fetchPosts();
   };
 
+  const getRemainingText = (createdAt) => {
+    const created = new Date(createdAt).getTime();
+    const limit = created + 7 * 60 * 60 * 1000;
+    const now = Date.now();
+    const diff = limit - now;
+
+    if (diff <= 0) return 'まもなく消えます';
+
+    const hours = Math.floor(diff / (60 * 60 * 1000));
+    const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+
+    if (hours <= 0) return `あと${minutes}分`;
+    return `あと${hours}時間${minutes}分`;
+  };
+
+  const PageButton = ({ value, children }) => (
+    <button
+      type="button"
+      onClick={() => setPage(value)}
+      className={`rounded-full border px-3 py-2 text-[11px] tracking-widest transition-all ${
+        page === value
+          ? 'border-[#D9C7FF] bg-[#EBDFFF]/15 text-[#F7F0FF] shadow-[0_0_18px_rgba(217,199,255,0.35)]'
+          : 'border-[#4C5678] bg-[#10162A]/70 text-[#96A2C8] hover:border-[#A9D6FF] hover:text-[#DDEEFF]'
+      }`}
+    >
+      {children}
+    </button>
+  );
+
+  const PostCard = ({ post, mine = false }) => {
+    const alreadyZzzed = zzzedPostIds.includes(post.id);
+    const zzzCount = post.zzz_count || 0;
+
+    return (
+      <article
+        className={`relative overflow-hidden rounded-3xl border px-6 py-6 text-center backdrop-blur-md transition-all ${
+          post.is_hidden
+            ? 'border-[#5D5475] bg-[#141426]/70 opacity-75'
+            : 'border-[#61709C]/70 bg-[#11182E]/75 shadow-[0_0_30px_rgba(127,157,255,0.12)]'
+        }`}
+      >
+        <div className="pointer-events-none absolute -top-10 left-1/2 h-20 w-36 -translate-x-1/2 rounded-full bg-[#BFD7FF]/10 blur-2xl" />
+
+        <p className="relative text-xl leading-9 tracking-[0.18em] text-[#F1F6FF] drop-shadow-[0_0_10px_rgba(191,215,255,0.35)]">
+          {post.text}
+        </p>
+
+        {mine && post.is_hidden && (
+          <p className="mt-4 text-[10px] tracking-widest text-[#D9C7FF]">
+            まどろみから、しずかに消えました
+          </p>
+        )}
+
+        {mine && !post.is_hidden && zzzCount >= 3 && (
+          <p className="mt-4 text-[10px] tracking-widest text-[#FFF0A8]">
+            まどろみに、残りました
+          </p>
+        )}
+
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-[11px] tracking-widest text-[#8FA0C8]">
+          {!mine && <span>{post.name}</span>}
+
+          {mine && (
+            <span>
+              {new Date(post.created_at).toLocaleDateString('ja-JP')}
+            </span>
+          )}
+
+          {!mine && (
+            <span className="text-[#66759D]">
+              {getRemainingText(post.created_at)}
+            </span>
+          )}
+
+          <span className="text-[#FFF0A8]">
+            zzz {zzzCount} / 3
+          </span>
+        </div>
+
+        {!mine && (
+          <button
+            type="button"
+            onClick={() => handleZzz(post.id)}
+            disabled={alreadyZzzed}
+            className={`mt-5 rounded-full border px-5 py-2 text-xs tracking-widest transition-all ${
+              alreadyZzzed
+                ? 'border-[#4C5678] text-[#637091] opacity-60'
+                : 'border-[#D9C7FF] bg-[#D9C7FF]/10 text-[#F4EEFF] hover:bg-[#D9C7FF]/20 hover:shadow-[0_0_18px_rgba(217,199,255,0.4)]'
+            }`}
+          >
+            {alreadyZzzed ? 'zzz 済み' : 'zzzを送る'}
+          </button>
+        )}
+
+        {mine && (
+          <button
+            type="button"
+            onClick={() => handleDeletePost(post.id)}
+            className="mt-5 rounded-full border border-[#6B5A80] px-4 py-2 text-[11px] tracking-widest text-[#CDBFE8] hover:border-[#D9C7FF] hover:text-[#F7F0FF]"
+          >
+            けす
+          </button>
+        )}
+      </article>
+    );
+  };
+
   return (
     <div
-      className="min-h-screen text-[#E8F8FF] antialiased flex flex-col items-center justify-start px-5 py-10 selection:bg-[#FF4FD8] selection:text-[#07111F] overflow-hidden relative"
+      className="relative min-h-screen overflow-hidden px-5 py-10 text-[#EEF4FF] antialiased"
       style={{
         fontFamily: "'DotGothic16', monospace",
         background:
-          'radial-gradient(circle at top, #263A5F 0%, #111827 35%, #080B14 100%)'
+          'radial-gradient(circle at top, #273154 0%, #12182D 38%, #070A13 100%)'
       }}
     >
-      <div className="pointer-events-none fixed inset-0 opacity-[0.08] bg-[linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[length:100%_4px]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(190,220,255,0.16),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(225,200,255,0.12),transparent_30%),radial-gradient(circle_at_50%_85%,rgba(255,240,168,0.08),transparent_35%)]" />
+      <div className="pointer-events-none fixed inset-0 opacity-[0.06] bg-[linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[length:100%_5px]" />
 
-      <div className="pointer-events-none fixed top-10 left-6 w-28 h-28 rounded-full bg-[#00E5FF] blur-3xl opacity-20" />
-      <div className="pointer-events-none fixed bottom-20 right-8 w-36 h-36 rounded-full bg-[#FF4FD8] blur-3xl opacity-20" />
+      <div className="pointer-events-none fixed left-8 top-24 text-[#D9C7FF]/20 text-5xl blur-[1px]">
+        z
+      </div>
+      <div className="pointer-events-none fixed right-10 top-52 text-[#A9D6FF]/20 text-4xl blur-[1px]">
+        z
+      </div>
+      <div className="pointer-events-none fixed bottom-28 left-12 text-[#FFF0A8]/20 text-3xl blur-[1px]">
+        z
+      </div>
 
-      <header className="relative z-10 mb-12 text-center w-full max-w-md">
-        <div className="border-2 border-[#00E5FF] bg-[#101827]/80 shadow-[0_0_24px_rgba(0,229,255,0.45)] px-6 py-7">
-          <p className="text-[10px] tracking-[0.45em] text-[#FFED70] mb-3">
-            MIDNIGHT CONVENIENCE
-          </p>
+      <div className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center">
+        <header className="mb-10 w-full text-center">
+          <div className="rounded-[2rem] border border-[#7180AE]/70 bg-[#10162A]/70 px-6 py-8 shadow-[0_0_45px_rgba(120,150,255,0.18)] backdrop-blur-md">
+            <p className="mb-4 text-[10px] tracking-[0.5em] text-[#FFF0A8]">
+              MIDNIGHT ZONE
+            </p>
 
-          <h1 className="text-5xl tracking-[0.2em] text-[#E8F8FF] drop-shadow-[0_0_10px_rgba(0,229,255,0.9)]">
-            ZZZ
-          </h1>
+            <h1 className="text-6xl tracking-[0.25em] text-[#F7F0FF] drop-shadow-[0_0_18px_rgba(217,199,255,0.75)]">
+              ZZZ
+            </h1>
 
-          <div className="mt-6 text-xs leading-7 text-[#BDEFFF] tracking-wider">
-            <p>眠る前の小さなひとことを</p>
-            <p>匿名の気配として置いていく場所。</p>
-            <p>1日1回、15文字以内の「うとうと」。</p>
-            <p>7時間以内に zzz が3つ届くと、まどろみに残ります。</p>
+            <div className="mt-7 space-y-2 text-xs leading-7 tracking-wider text-[#BED0F8]">
+              <p>眠る前の小さなひとことを</p>
+              <p>匿名の気配として置いていく場所。</p>
+              <p>7時間以内に zzz が3つ届くと、</p>
+              <p>そのまどろみは、少しだけ残ります。</p>
+            </div>
           </div>
-        </div>
 
-        <nav className="mt-6 grid grid-cols-3 gap-2 text-xs tracking-widest">
-          <button
-            type="button"
-            onClick={() => setPage('timeline')}
-            className={`border-2 px-2 py-3 transition-all ${
-              page === 'timeline'
-                ? 'border-[#FF4FD8] text-[#FFB8EF] bg-[#2B1230] shadow-[0_0_14px_rgba(255,79,216,0.5)]'
-                : 'border-[#37516B] text-[#7CA7BE] bg-[#0D1422] hover:border-[#00E5FF]'
-            }`}
-          >
-            まどろみ
-          </button>
+          <nav className="mt-5 grid grid-cols-3 gap-2">
+            <PageButton value="timeline">まどろみ</PageButton>
+            <PageButton value="mine">わたし</PageButton>
+            <PageButton value="about">zzzについて</PageButton>
+          </nav>
+        </header>
 
-          <button
-            type="button"
-            onClick={() => setPage('mine')}
-            className={`border-2 px-2 py-3 transition-all ${
-              page === 'mine'
-                ? 'border-[#FF4FD8] text-[#FFB8EF] bg-[#2B1230] shadow-[0_0_14px_rgba(255,79,216,0.5)]'
-                : 'border-[#37516B] text-[#7CA7BE] bg-[#0D1422] hover:border-[#00E5FF]'
-            }`}
-          >
-            わたし
-          </button>
+        <main className="w-full space-y-10">
+          {page === 'timeline' && (
+            <>
+              <section className="rounded-[2rem] border border-[#4C5678] bg-[#10162A]/70 p-5 shadow-[0_0_30px_rgba(0,0,0,0.25)] backdrop-blur-md">
+                {!hasPosted ? (
+                  <form onSubmit={handlePost} className="space-y-4">
+                    <input
+                      type="text"
+                      value={utouto}
+                      onChange={(e) => setUtouto(e.target.value.slice(0, 15))}
+                      placeholder="うとうとを、15文字以内で"
+                      className="w-full rounded-full border border-[#7180AE] bg-[#080D1A]/80 px-5 py-4 text-center text-sm tracking-wider text-[#F4F7FF] outline-none placeholder:text-[#66759D] focus:border-[#D9C7FF] focus:shadow-[0_0_18px_rgba(217,199,255,0.25)]"
+                    />
 
-          <button
-            type="button"
-            onClick={() => setPage('about')}
-            className={`border-2 px-2 py-3 transition-all ${
-              page === 'about'
-                ? 'border-[#FF4FD8] text-[#FFB8EF] bg-[#2B1230] shadow-[0_0_14px_rgba(255,79,216,0.5)]'
-                : 'border-[#37516B] text-[#7CA7BE] bg-[#0D1422] hover:border-[#00E5FF]'
-            }`}
-          >
-            zzzについて
-          </button>
-        </nav>
-      </header>
-
-      <main className="relative z-10 w-full max-w-md space-y-12">
-        {page === 'timeline' && (
-          <>
-            <section className="border-2 border-[#37516B] bg-[#0D1422]/90 p-5 shadow-[8px_8px_0px_rgba(0,0,0,0.35)]">
-              {!hasPosted ? (
-                <form onSubmit={handlePost} className="space-y-4">
-                  <input
-                    type="text"
-                    value={utouto}
-                    onChange={(e) => setUtouto(e.target.value.slice(0, 15))}
-                    placeholder="うとうとを、15文字以内で"
-                    className="w-full bg-[#07111F] border-2 border-[#00E5FF]/70 focus:border-[#FFED70] outline-none px-4 py-4 text-center text-sm placeholder-[#5F8CA3] tracking-wider text-[#E8F8FF] shadow-[0_0_12px_rgba(0,229,255,0.18)]"
-                  />
-
-                  <div className="flex justify-between items-center text-xs text-[#7CA7BE]">
-                    <span>{utouto.length} / 15</span>
-                    <button
-                      type="submit"
-                      disabled={!utouto.trim()}
-                      className="border-2 border-[#FF4FD8] text-[#FFB8EF] px-4 py-2 bg-[#2B1230] hover:bg-[#401B47] disabled:opacity-30 disabled:hover:bg-[#2B1230] shadow-[0_0_12px_rgba(255,79,216,0.35)]"
-                    >
-                      おくる
-                    </button>
+                    <div className="flex items-center justify-between px-2 text-xs tracking-widest text-[#8FA0C8]">
+                      <span>{utouto.length} / 15</span>
+                      <button
+                        type="submit"
+                        disabled={!utouto.trim()}
+                        className="rounded-full border border-[#D9C7FF] bg-[#D9C7FF]/10 px-5 py-2 text-[#F4EEFF] transition-all hover:bg-[#D9C7FF]/20 disabled:opacity-30"
+                      >
+                        おくる
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="space-y-3 text-center">
+                    <p className="text-xs tracking-widest text-[#FFF0A8]">
+                      きょうの うとうと は、もうおわりました。
+                    </p>
+                    <p className="text-[11px] tracking-widest text-[#8FA0C8]">
+                      あなたの気配：{currentUser}
+                    </p>
                   </div>
-                </form>
-              ) : (
-                <div className="text-center space-y-3">
-                  <p className="text-xs text-[#FFED70] tracking-wider">
-                    きょうの うとうと は、もうおわりました。
-                  </p>
-                  <p className="text-[11px] text-[#7CA7BE]">
-                    あなたの気配：{currentUser}
-                  </p>
-                </div>
-              )}
-            </section>
+                )}
+              </section>
 
-            <section className="space-y-6">
-              <h2 className="text-center text-xs tracking-[0.45em] text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]">
-                まどろみ
+              <section className="space-y-5">
+                <h2 className="text-center text-xs tracking-[0.45em] text-[#D9C7FF] drop-shadow-[0_0_10px_rgba(217,199,255,0.5)]">
+                  まどろみ
+                </h2>
+
+                {loading ? (
+                  <p className="text-center text-xs tracking-widest text-[#8FA0C8]">
+                    よみこみ中...
+                  </p>
+                ) : timeline.length === 0 ? (
+                  <p className="text-center text-xs leading-7 tracking-widest text-[#8FA0C8]">
+                    いま見える、まどろみはありません。
+                  </p>
+                ) : (
+                  <div className="space-y-5">
+                    {timeline.map((post) => (
+                      <PostCard key={post.id} post={post} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </>
+          )}
+
+          {page === 'mine' && (
+            <section className="space-y-5">
+              <h2 className="text-center text-xs tracking-[0.45em] text-[#D9C7FF] drop-shadow-[0_0_10px_rgba(217,199,255,0.5)]">
+                わたしのうとうと
               </h2>
 
-              {loading ? (
-                <p className="text-xs text-[#7CA7BE] text-center tracking-wider">
-                  よみこみ中...
-                </p>
-              ) : timeline.length === 0 ? (
-                <p className="text-xs text-[#7CA7BE] text-center tracking-wider">
-                  いま見える、まどろみはありません。
-                </p>
+              {myPosts.length === 0 ? (
+                <div className="rounded-[2rem] border border-[#4C5678] bg-[#10162A]/70 p-8 text-center backdrop-blur-md">
+                  <p className="text-xs tracking-widest text-[#8FA0C8]">
+                    まだ、うとうとはありません。
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-5">
-                  {timeline.map((post) => {
-                    const alreadyZzzed = zzzedPostIds.includes(post.id);
-
-                    return (
-                      <article
-                        key={post.id}
-                        className="border-2 border-[#37516B] bg-[#0D1422]/90 p-5 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)]"
-                      >
-                        <p className="text-lg tracking-wider text-[#E8F8FF] drop-shadow-[0_0_8px_rgba(232,248,255,0.35)]">
-                          {post.text}
-                        </p>
-
-                        <div className="mt-4 flex items-center justify-center gap-4 text-xs text-[#7CA7BE]">
-                          <span>{post.name}</span>
-
-                          <button
-                            type="button"
-                            onClick={() => handleZzz(post.id)}
-                            disabled={alreadyZzzed}
-                            className={`border px-3 py-1 transition-all ${
-                              alreadyZzzed
-                                ? 'border-[#37516B] text-[#5F8CA3] opacity-50'
-                                : 'border-[#FF4FD8] text-[#FFB8EF] hover:bg-[#2B1230] hover:shadow-[0_0_10px_rgba(255,79,216,0.5)]'
-                            }`}
-                          >
-                            zzz
-                            {(post.zzz_count || 0) > 0 && (
-                              <span className="ml-2 text-[#FFED70]">
-                                {post.zzz_count}
-                              </span>
-                            )}
-                          </button>
-                        </div>
-                      </article>
-                    );
-                  })}
+                  {myPosts.map((post) => (
+                    <PostCard key={post.id} post={post} mine />
+                  ))}
                 </div>
               )}
             </section>
-          </>
-        )}
+          )}
 
-        {page === 'mine' && (
-          <section className="space-y-6">
-            <h2 className="text-center text-xs tracking-[0.45em] text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]">
-              わたしのうとうと
-            </h2>
+          {page === 'about' && (
+            <section className="space-y-5">
+              <h2 className="text-center text-xs tracking-[0.45em] text-[#D9C7FF] drop-shadow-[0_0_10px_rgba(217,199,255,0.5)]">
+                zzzについて
+              </h2>
 
-            {myPosts.length === 0 ? (
-              <div className="border-2 border-[#37516B] bg-[#0D1422]/90 p-8 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)]">
-                <p className="text-xs text-[#7CA7BE] tracking-wider">
-                  まだ、うとうとはありません。
-                </p>
+              <div className="space-y-6 rounded-[2rem] border border-[#4C5678] bg-[#10162A]/70 p-6 text-xs leading-7 tracking-wider text-[#BED0F8] shadow-[0_0_30px_rgba(0,0,0,0.25)] backdrop-blur-md">
+                <div>
+                  <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
+                    ZZZは、眠る前の置き場です
+                  </h3>
+                  <p>
+                    眠る前に浮かんだ小さなひとことを、
+                    匿名の気配として置いていく場所です。
+                    日記ほどはっきりしていなくても大丈夫です。
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
+                    うとうとは、1日1回だけ
+                  </h3>
+                  <p>
+                    投稿できるのは1日1回、15文字まで。
+                    長く説明しすぎないことで、
+                    眠る前の一瞬だけが残ります。
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
+                    zzzは、小さな合図です
+                  </h3>
+                  <p>
+                    誰かの投稿に言葉で返すことはできません。
+                    そのかわりに zzz を送れます。
+                    「わかる」「そこにいるよ」くらいの静かな反応です。
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
+                    7時間以内に3zzzで残ります
+                  </h3>
+                  <p>
+                    投稿から7時間以内に zzz が3つ届くと、
+                    その投稿は「まどろみ」に残ります。
+                    届かなかった投稿は、みんなの画面から静かに消えます。
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
+                    消えても、自分だけは見返せます
+                  </h3>
+                  <p>
+                    まどろみから消えた投稿も、
+                    投稿した本人の「わたし」ページには残ります。
+                    みんなの場所から消えても、自分の記録として残ります。
+                  </p>
+                </div>
               </div>
-            ) : (
-              <div className="space-y-5">
-                {myPosts.map((post) => (
-                  <article
-                    key={post.id}
-                    className={`border-2 bg-[#0D1422]/90 p-5 text-center shadow-[6px_6px_0px_rgba(0,0,0,0.35)] ${
-                      post.is_hidden
-                        ? 'border-[#5F4B6B] opacity-75'
-                        : 'border-[#37516B]'
-                    }`}
-                  >
-                    <p className="text-lg tracking-wider text-[#E8F8FF]">
-                      {post.text}
-                    </p>
+            </section>
+          )}
+        </main>
 
-                    {post.is_hidden && (
-                      <p className="mt-3 text-[10px] text-[#FFB8EF] tracking-wider">
-                        まどろみから、消えました
-                      </p>
-                    )}
-
-                    {!post.is_hidden && (post.zzz_count || 0) >= 3 && (
-                      <p className="mt-3 text-[10px] text-[#FFED70] tracking-wider">
-                        まどろみに、残りました
-                      </p>
-                    )}
-
-                    <div className="mt-4 text-xs text-[#7CA7BE] flex justify-center gap-4">
-                      <span>
-                        {new Date(post.created_at).toLocaleDateString('ja-JP')}
-                      </span>
-
-                      <span className="text-[#FFED70]">
-                        zzz {post.zzz_count || 0}
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeletePost(post.id)}
-                      className="mt-5 border border-[#FF4FD8]/60 text-[#FFB8EF] px-3 py-1 text-xs hover:bg-[#2B1230] hover:shadow-[0_0_10px_rgba(255,79,216,0.4)]"
-                    >
-                      けす
-                    </button>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
-
-        {page === 'about' && (
-          <section className="space-y-5">
-            <h2 className="text-center text-xs tracking-[0.45em] text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]">
-              zzzについて
-            </h2>
-
-            <div className="border-2 border-[#37516B] bg-[#0D1422]/90 p-6 shadow-[6px_6px_0px_rgba(0,0,0,0.35)] space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  ここは、眠る前の置き場です
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  ZZZは、眠る前に浮かんだ小さなひとことを、
-                  匿名の「気配」として置いていく場所です。
-                  はっきりした日記でも、強い投稿でもなく、
-                  ただそこにある短いまどろみを集めています。
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  投稿は1日1回、15文字まで
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  投稿できる「うとうと」は、1日1回だけです。
-                  文字数は15文字以内。
-                  長く説明しすぎないことで、
-                  眠る前の一瞬の気配だけが残るようにしています。
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  名前はランダムな気配名です
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  投稿者の名前は表示されません。
-                  かわりに「深夜の人」「雨の日の人」のような
-                  気配名が自動でつきます。
-                  誰かを強く主張するのではなく、
-                  なんとなく誰かがいる感じを大切にしています。
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  zzzは、静かなリアクションです
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  誰かのうとうとに、言葉で返すことはできません。
-                  そのかわりに、静かに zzz を送れます。
-                  zzz は「わかる」「そこにいるよ」くらいの、
-                  小さな合図です。
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  7時間以内にzzzが3つ届くと残ります
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  投稿から7時間以内に zzz が3つ以上届くと、
-                  その投稿は「まどろみ」に残ります。
-                  3つ届かなかった投稿は、
-                  みんなの画面から静かに消えていきます。
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  消えても、自分だけは見返せます
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  まどろみから消えた投稿も、
-                  投稿した本人の「わたし」ページには残ります。
-                  みんなの場所からは消えても、
-                  自分の眠る前の記録としては見返せます。
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-[#FFED70] text-sm tracking-widest">
-                  これはまだ小さな実験です
-                </h3>
-                <p className="text-xs leading-7 text-[#BDEFFF] tracking-wider">
-                  ZZZは、深夜のコンビニの前にあるような、
-                  少し光っていて、少しさみしい場所を目指しています。
-                  正しいことを言う場所ではなく、
-                  眠る前の気配を置いていくための小さな実験です。
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
-
-      <footer className="relative z-10 mt-20 text-[10px] text-[#5F8CA3] tracking-[0.35em]">
-        ただ、そこにいるだけ
-      </footer>
+        <footer className="mt-20 text-center text-[10px] tracking-[0.35em] text-[#66759D]">
+          ただ、そこにいるだけ
+        </footer>
+      </div>
     </div>
   );
 }
