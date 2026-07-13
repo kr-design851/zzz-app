@@ -118,8 +118,9 @@ export default function ZzzApp() {
     );
 
     const { error } = await supabase.rpc('increment_zzz', {
-      post_id: postId
-    });
+  p_post_id: postId
+});
+
 
     if (error) {
       console.error(error);
