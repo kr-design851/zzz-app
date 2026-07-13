@@ -21,6 +21,7 @@ export default function ZzzApp() {
   const [utouto, setUtouto] = useState('');
   const [hasPosted, setHasPosted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [zzzedPostIds, setZzzedPostIds] = useState([]);
 
   const [currentUser] = useState(() => {
     const savedName = localStorage.getItem('zzz-current-user');
@@ -48,6 +49,12 @@ export default function ZzzApp() {
 
     if (postedDate === today) {
       setHasPosted(true);
+    }
+
+    const savedZzzedPostIds = localStorage.getItem('zzz-zzzed-post-ids');
+
+    if (savedZzzedPostIds) {
+      setZzzedPostIds(JSON.parse(savedZzzedPostIds));
     }
   }, []);
 
@@ -90,6 +97,35 @@ export default function ZzzApp() {
     setUtouto('');
     setHasPosted(true);
     localStorage.setItem('zzz-posted-date', new Date().toDateString());
+
+    fetchPosts();
+  };
+
+  const handleZzz = async (postId) => {
+    if (zzzedPostIds.includes(postId)) return;
+
+    const updatedZzzedPostIds = [...zzzedPostIds, postId];
+
+    setZzzedPostIds(updatedZzzedPostIds);
+    localStorage.setItem('zzz-zzzed-post-ids', JSON.stringify(updatedZzzedPostIds));
+
+    setTimeline((posts) =>
+      posts.map((post) =>
+        post.id === postId
+          ? { ...post, zzz_count: (post.zzz_count || 0) + 1 }
+          : post
+      )
+    );
+
+    const { error } = await supabase.rpc('increment_zzz', {
+      post_id: postId
+    });
+
+    if (error) {
+      console.error(error);
+      alert('zzzに失敗しました。少し時間をおいて試してください。');
+      return;
+    }
 
     fetchPosts();
   };
@@ -168,25 +204,38 @@ export default function ZzzApp() {
                 </p>
               ) : (
                 <div className="space-y-10">
-                  {timeline.map((post) => (
-                    <article key={post.id} className="flex flex-col items-center space-y-3 group">
-                      <p className="text-base tracking-wide font-light text-[#222222]">
-                        {post.text}
-                      </p>
+                  {timeline.map((post) => {
+                    const alreadyZzzed = zzzedPostIds.includes(post.id);
 
-                      <div className="flex items-center space-x-4 text-xs text-[#999999] opacity-60 group-hover:opacity-100 transition-opacity">
-                        <span className="select-none font-light">{post.name}</span>
-                        <button
-                          onClick={() => {
-                            console.log(`zzz to ${post.id}`);
-                          }}
-                          className="hover:text-[#333333] transition-colors select-none font-medium tracking-tighter"
-                        >
-                          zzz
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+                    return (
+                      <article key={post.id} className="flex flex-col items-center space-y-3 group">
+                        <p className="text-base tracking-wide font-light text-[#222222]">
+                          {post.text}
+                        </p>
+
+                        <div className="flex items-center space-x-4 text-xs text-[#999999] opacity-60 group-hover:opacity-100 transition-opacity">
+                          <span className="select-none font-light">{post.name}</span>
+
+                          <button
+                            onClick={() => handleZzz(post.id)}
+                            disabled={alreadyZzzed}
+                            className={`transition-colors select-none font-medium tracking-tighter ${
+                              alreadyZzzed
+                                ? 'text-[#333333] opacity-40 cursor-default'
+                                : 'hover:text-[#333333]'
+                            }`}
+                          >
+                            zzz
+                            {(post.zzz_count || 0) > 0 && (
+                              <span className="ml-1 text-[10px] opacity-60">
+                                {post.zzz_count}
+                              </span>
+                            )}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </section>
@@ -210,10 +259,13 @@ export default function ZzzApp() {
                     <p className="text-base tracking-wide font-light text-[#222222]">
                       {post.text}
                     </p>
-                    <div className="text-xs text-[#999999] opacity-60">
+                    <div className="text-xs text-[#999999] opacity-60 flex items-center gap-3">
                       <span>
                         {new Date(post.created_at).toLocaleDateString('ja-JP')}
                       </span>
+                      {(post.zzz_count || 0) > 0 && (
+                        <span>zzz {post.zzz_count}</span>
+                      )}
                     </div>
                   </article>
                 ))}
