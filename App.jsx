@@ -28,6 +28,8 @@ export default function ZzzApp() {
   const [hasPosted, setHasPosted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [zzzedPostIds, setZzzedPostIds] = useState([]);
+  const [showNegotoModal, setShowNegotoModal] = useState(false);
+  const [closeMessage, setCloseMessage] = useState('');
 
   const [utoutoPlaceholder] = useState(() => {
     return UTOUTO_PLACEHOLDERS[
@@ -199,6 +201,17 @@ export default function ZzzApp() {
       console.error(error);
       window.prompt('このURLをコピーしてください', shareUrl);
     }
+  };
+
+  const handleSleepClose = () => {
+    setCloseMessage('');
+
+    window.open('', '_self');
+    window.close();
+
+    setTimeout(() => {
+      setCloseMessage('このままブラウザを閉じて、おやすみなさい。');
+    }, 300);
   };
 
   const PageButton = ({ value, children }) => (
@@ -481,7 +494,7 @@ export default function ZzzApp() {
           )}
         </main>
 
-        <footer className="mt-20 w-full text-center space-y-5">
+        <footer className="mt-20 w-full text-center space-y-4">
           <button
             type="button"
             onClick={handleShare}
@@ -490,11 +503,59 @@ export default function ZzzApp() {
             zzzを共有する
           </button>
 
-          <p className="text-[10px] tracking-[0.35em] text-[#66759D]">
+          <button
+            type="button"
+            onClick={() => {
+              setCloseMessage('');
+              setShowNegotoModal(true);
+            }}
+            className="w-full rounded-full border border-[#6B5A80] bg-[#141426]/70 px-4 py-3 text-[11px] tracking-widest text-[#CDBFE8] transition-all hover:border-[#FFF0A8] hover:text-[#FFF0A8] hover:shadow-[0_0_18px_rgba(255,240,168,0.18)]"
+          >
+            ねごとをいう
+          </button>
+
+          <p className="pt-1 text-[10px] tracking-[0.35em] text-[#66759D]">
             ただ、そこにいるだけ
           </p>
         </footer>
       </div>
+
+      {showNegotoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050711]/80 px-5 backdrop-blur-md">
+          <div className="w-full max-w-sm rounded-[2rem] border border-[#D9C7FF]/70 bg-[#10162A]/95 px-7 py-8 text-center shadow-[0_0_50px_rgba(217,199,255,0.25)]">
+            <p className="mb-6 text-xs tracking-[0.4em] text-[#FFF0A8]">
+              NEGOTO
+            </p>
+
+            <p className="text-lg leading-9 tracking-widest text-[#F7F0FF] drop-shadow-[0_0_14px_rgba(217,199,255,0.5)]">
+              では、<br />
+              おやすみなさい。
+            </p>
+
+            <button
+              type="button"
+              onClick={handleSleepClose}
+              className="mt-8 rounded-full border border-[#D9C7FF] bg-[#D9C7FF]/10 px-8 py-3 text-sm tracking-[0.35em] text-[#F4EEFF] transition-all hover:bg-[#D9C7FF]/20 hover:shadow-[0_0_18px_rgba(217,199,255,0.35)]"
+            >
+              zzz
+            </button>
+
+            {closeMessage && (
+              <p className="mt-5 text-[11px] leading-6 tracking-wider text-[#8FA0C8]">
+                {closeMessage}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setShowNegotoModal(false)}
+              className="mt-5 text-[10px] tracking-widest text-[#66759D] hover:text-[#BED0F8]"
+            >
+              まだ起きている
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
