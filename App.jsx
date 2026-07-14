@@ -14,6 +14,12 @@ const KEHAI_NAMES = [
   '3階の人'
 ];
 
+const UTOUTO_PLACEHOLDERS = [
+  'いま思い浮かんだこと',
+  '眠たくても残したいこと',
+  '忘れてもいいこと'
+];
+
 export default function ZzzApp() {
   const [page, setPage] = useState('timeline');
   const [timeline, setTimeline] = useState([]);
@@ -22,6 +28,12 @@ export default function ZzzApp() {
   const [hasPosted, setHasPosted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [zzzedPostIds, setZzzedPostIds] = useState([]);
+
+  const [utoutoPlaceholder] = useState(() => {
+    return UTOUTO_PLACEHOLDERS[
+      Math.floor(Math.random() * UTOUTO_PLACEHOLDERS.length)
+    ];
+  });
 
   const [currentUser] = useState(() => {
     const savedName = localStorage.getItem('zzz-current-user');
@@ -329,7 +341,7 @@ export default function ZzzApp() {
                       type="text"
                       value={utouto}
                       onChange={(e) => setUtouto(e.target.value.slice(0, 15))}
-                      placeholder="うとうとを、15文字以内で"
+                      placeholder={utoutoPlaceholder}
                       className="w-full rounded-full border border-[#7180AE] bg-[#080D1A]/80 px-5 py-4 text-center text-sm tracking-wider text-[#F4F7FF] outline-none placeholder:text-[#66759D] focus:border-[#D9C7FF] focus:shadow-[0_0_18px_rgba(217,199,255,0.25)]"
                     />
 
