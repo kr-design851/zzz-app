@@ -15,9 +15,9 @@ const KEHAI_NAMES = [
 ];
 
 const UTOUTO_PLACEHOLDERS = [
-  'いま思い浮かんだうとうと',
-  '眠たくても残したいうとうと',
-  '忘れてもいいうとうと'
+  'いま思い浮かんだこと',
+  '眠くても残したいこと',
+  '忘れてもいいこと'
 ];
 
 const getPostDayKey = () => {
@@ -124,7 +124,7 @@ export default function ZzzApp() {
 
   const handlePost = async (e) => {
     e.preventDefault();
-    if (!utouto.trim() || utouto.length > 15 || hasPosted) return;
+    if (!utouto.trim() || utouto.length > 17 || hasPosted) return;
 
     const { error } = await supabase.from('posts').insert({
       name: currentUser,
@@ -352,7 +352,7 @@ export default function ZzzApp() {
 
             <div className="mt-7 space-y-2 text-xs leading-7 tracking-wider text-[#BED0F8]">
               <p>眠る前に小さなひとことを</p>
-              <p>1日1回、15文字以内の「うとうと」</p>
+              <p>1日1回、17文字以内の「うとうと」</p>
               <p>誰かのうとうとには z を送れます</p>
             </div>
           </div>
@@ -373,13 +373,13 @@ export default function ZzzApp() {
                     <input
                       type="text"
                       value={utouto}
-                      onChange={(e) => setUtouto(e.target.value.slice(0, 15))}
+                      onChange={(e) => setUtouto(e.target.value.slice(0, 17))}
                       placeholder={utoutoPlaceholder}
                       className="w-full rounded-full border border-[#7180AE] bg-[#080D1A]/80 px-5 py-4 text-center text-sm tracking-wider text-[#F4F7FF] outline-none placeholder:text-[#66759D] focus:border-[#D9C7FF] focus:shadow-[0_0_18px_rgba(217,199,255,0.25)]"
                     />
 
                     <div className="flex items-center justify-between px-2 text-xs tracking-widest text-[#8FA0C8]">
-                      <span>{utouto.length} / 15</span>
+                      <span>{utouto.length} / 17</span>
                       <button
                         type="submit"
                         disabled={!utouto.trim()}
@@ -469,7 +469,7 @@ export default function ZzzApp() {
                     うとうとは、1日1回だけ
                   </h3>
                   <p>
-                    投稿できるのは1日1回、15文字まで。23時にリセットされます。
+                    投稿できるのは1日1回、17文字まで。23時にリセットされます。
                   </p>
                 </div>
 
@@ -529,15 +529,14 @@ export default function ZzzApp() {
           </button>
 
           <div className="pt-1 space-y-2">
-  <p className="text-[10px] tracking-[0.35em] text-[#66759D]">
-    ただ、そこにいるだけ
-  </p>
+            <p className="text-[10px] tracking-[0.35em] text-[#66759D]">
+              ただ、そこにいるだけ
+            </p>
 
-  <p className="text-[10px] tracking-[0.25em] text-[#4F5B7D]">
-    Supported by FUZZZY MARKET
-  </p>
-</div>
-
+            <p className="text-[10px] tracking-[0.25em] text-[#4F5B7D]">
+              Supported by FUZZZY MARKET
+            </p>
+          </div>
         </footer>
       </div>
 
@@ -572,7 +571,7 @@ export default function ZzzApp() {
               onClick={() => setShowNegotoModal(false)}
               className="mt-5 text-[10px] tracking-widest text-[#66759D] hover:text-[#BED0F8]"
             >
-              まだ起きている
+              まだ起きてる
             </button>
           </div>
         </div>
