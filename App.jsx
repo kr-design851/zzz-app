@@ -20,6 +20,20 @@ const UTOUTO_PLACEHOLDERS = [
   '忘れてもいいうとうと'
 ];
 
+const getPostDayKey = () => {
+  const date = new Date();
+
+  if (date.getHours() < 23) {
+    date.setDate(date.getDate() - 1);
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
 export default function ZzzApp() {
   const [page, setPage] = useState('timeline');
   const [timeline, setTimeline] = useState([]);
@@ -59,9 +73,9 @@ export default function ZzzApp() {
     fetchPosts();
 
     const postedDate = localStorage.getItem('zzz-posted-date');
-    const today = new Date().toDateString();
+    const currentPostDay = getPostDayKey();
 
-    if (postedDate === today) {
+    if (postedDate === currentPostDay) {
       setHasPosted(true);
     }
 
@@ -127,7 +141,7 @@ export default function ZzzApp() {
 
     setUtouto('');
     setHasPosted(true);
-    localStorage.setItem('zzz-posted-date', new Date().toDateString());
+    localStorage.setItem('zzz-posted-date', getPostDayKey());
 
     fetchPosts();
   };
@@ -455,7 +469,7 @@ export default function ZzzApp() {
                     うとうとは、1日1回だけ
                   </h3>
                   <p>
-                    投稿できるのは1日1回、15文字まで。
+                    投稿できるのは1日1回、15文字まで。23時にリセットされます。
                   </p>
                 </div>
 
