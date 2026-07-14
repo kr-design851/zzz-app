@@ -15,9 +15,9 @@ const KEHAI_NAMES = [
 ];
 
 const UTOUTO_PLACEHOLDERS = [
-  'いま思い浮かんだこと',
-  '眠たくても残したいこと',
-  '忘れてもいいこと'
+  'いま思い浮かんだうとうと',
+  '眠たくても残したいうとうと',
+  '忘れてもいいうとうと'
 ];
 
 export default function ZzzApp() {
@@ -139,7 +139,7 @@ export default function ZzzApp() {
 
     if (error) {
       console.error(error);
-      alert('zzzに失敗しました。少し時間をおいて試してください。');
+      alert('zに失敗しました。少し時間をおいて試してください。');
       return;
     }
 
@@ -178,7 +178,7 @@ export default function ZzzApp() {
 
     const shareData = {
       title: 'ZZZ｜眠る前の小さなひとこと',
-      text: '眠る前の小さなひとことを、匿名の気配として置いていく場所。',
+      text: '眠る前の小さなひとことを置いていく場所。',
       url: shareUrl
     };
 
@@ -218,6 +218,7 @@ export default function ZzzApp() {
   const PostCard = ({ post, mine = false }) => {
     const alreadyZzzed = zzzedPostIds.includes(post.id);
     const zzzCount = post.zzz_count || 0;
+    const zDisplay = 'z'.repeat(Math.min(zzzCount, 3));
 
     return (
       <article
@@ -232,6 +233,12 @@ export default function ZzzApp() {
         <p className="relative text-xl leading-9 tracking-[0.18em] text-[#F1F6FF] drop-shadow-[0_0_10px_rgba(191,215,255,0.35)]">
           {post.text}
         </p>
+
+        {zDisplay && (
+          <p className="mt-4 text-lg tracking-[0.35em] text-[#D9C7FF] drop-shadow-[0_0_12px_rgba(217,199,255,0.5)]">
+            {zDisplay}
+          </p>
+        )}
 
         {mine && post.is_hidden && (
           <p className="mt-4 text-[10px] tracking-widest text-[#D9C7FF]">
@@ -266,7 +273,7 @@ export default function ZzzApp() {
                 : 'border-[#D9C7FF] bg-[#D9C7FF]/10 text-[#F4EEFF] hover:bg-[#D9C7FF]/20 hover:shadow-[0_0_18px_rgba(217,199,255,0.4)]'
             }`}
           >
-            {alreadyZzzed ? 'zzz 済み' : 'zzzを送る'}
+            z
           </button>
         )}
 
@@ -317,10 +324,9 @@ export default function ZzzApp() {
             </h1>
 
             <div className="mt-7 space-y-2 text-xs leading-7 tracking-wider text-[#BED0F8]">
-              <p>眠る前の小さなひとことを</p>
-              <p>匿名の気配として置いていく場所</p>
+              <p>眠る前に小さなひとことを</p>
               <p>1日1回、15文字以内の「うとうと」</p>
-              <p>誰かのうとうとには zzz を送れます</p>
+              <p>誰かのうとうとには z を送れます</p>
             </div>
           </div>
 
@@ -423,11 +429,11 @@ export default function ZzzApp() {
               <div className="space-y-6 rounded-[2rem] border border-[#4C5678] bg-[#10162A]/70 p-6 text-xs leading-7 tracking-wider text-[#BED0F8] shadow-[0_0_30px_rgba(0,0,0,0.25)] backdrop-blur-md">
                 <div>
                   <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
-                    ZZZは、眠る前の置き場です
+                    ZZZは、眠る前に集まる空間です
                   </h3>
                   <p>
                     眠る前に浮かんだ小さなひとことを、
-                    匿名の気配として置いていく場所です。
+                    匿名の気配として置いていくことができます。
                   </p>
                 </div>
 
@@ -442,20 +448,20 @@ export default function ZzzApp() {
 
                 <div>
                   <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
-                    zzzは、小さな合図です
+                    zは、小さな合図です
                   </h3>
                   <p>
                     誰かの投稿に言葉で返すことはできません。
-                    そのかわりに zzz を送れます。
+                    そのかわりに z を送れます。
                   </p>
                 </div>
 
                 <div>
                   <h3 className="mb-2 text-sm tracking-widest text-[#FFF0A8]">
-                    7時間以内に3zzzで残ります
+                    7時間以内にzzzで残ります
                   </h3>
                   <p>
-                    投稿から7時間以内に zzz が3つ届くと、
+                    投稿から7時間以内に z が3つ届くと、
                     その投稿は「まどろみ」に残ります。
                     届かなかった投稿は、みんなの画面から静かに消えます。
                   </p>
