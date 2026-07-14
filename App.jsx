@@ -528,9 +528,16 @@ export default function ZzzApp() {
             ねごとをいう
           </button>
 
-          <p className="pt-1 text-[10px] tracking-[0.35em] text-[#66759D]">
-            ただ、そこにいるだけ
-          </p>
+          <div className="pt-1 space-y-2">
+  <p className="text-[10px] tracking-[0.35em] text-[#66759D]">
+    ただ、そこにいるだけ
+  </p>
+
+  <p className="text-[10px] tracking-[0.25em] text-[#4F5B7D]">
+    Supported by FUZZZY MARKET
+  </p>
+</div>
+
         </footer>
       </div>
 
