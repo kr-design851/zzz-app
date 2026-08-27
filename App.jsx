@@ -107,7 +107,7 @@ FUZZZY MARKETという架空の夜のマーケットに合う歌詞、または�
 今回のトーン：
 ${tones.map((tone) => `・${tone}`).join('\n')}
 
-使ううとうと：
+歌詞に使ってほしい素材フレーズ：
 ${sourcePhrases.map((phrase) => `・${phrase}`).join('\n')}
 
 条件：
@@ -115,7 +115,8 @@ ${sourcePhrases.map((phrase) => `・${phrase}`).join('\n')}
 ・タイトルをつけてください
 ・歌詞として読める形にしてください
 ・短めの曲として成立する構成にしてください
-・素材のフレーズはそのまま使っても、少し変えてもOKです
+・上の素材フレーズを、歌詞の中に必ずいくつか取り入れてください
+・素材フレーズはそのまま使っても、少し自然に言い換えてもOKです
 ・深夜、まどろみ、眠る前の気配を感じる雰囲気にしてください
 ・説明ではなく、作品として出力してください`;
 };
@@ -134,7 +135,6 @@ export default function ZzzApp() {
   const [songPrompt, setSongPrompt] = useState('');
   const [promptLoading, setPromptLoading] = useState(false);
   const [promptSources, setPromptSources] = useState([]);
-  const [promptTones, setPromptTones] = useState([]);
 
   const [utoutoPlaceholder] = useState(() => {
     return UTOUTO_PLACEHOLDERS[
@@ -313,7 +313,6 @@ export default function ZzzApp() {
     setPromptLoading(true);
     setSongPrompt('');
     setPromptSources([]);
-    setPromptTones([]);
 
     const { data, error } = await supabase
       .from('posts')
@@ -336,7 +335,6 @@ export default function ZzzApp() {
     ];
 
     setPromptSources(pickedPhrases);
-    setPromptTones(pickedTones);
     setSongPrompt(buildSongPrompt(pickedPhrases, pickedTones));
     setPromptLoading(false);
   };
@@ -703,25 +701,6 @@ export default function ZzzApp() {
               </p>
             ) : (
               <>
-                {promptTones.length > 0 && (
-                  <div className="mb-5 rounded-3xl border-4 border-[#9CCC72] bg-[#F3FFFC]/70 px-4 py-4 text-left shadow-[5px_5px_0_rgba(156,204,114,0.35)]">
-                    <p className="mb-3 text-[10px] tracking-widest text-[#2B8BAA]">
-                      今回のトーン
-                    </p>
-
-                    <div className="space-y-2">
-                      {promptTones.map((tone, index) => (
-                        <p
-                          key={`${tone}-${index}`}
-                          className="text-[11px] leading-5 tracking-wider text-[#6B5487]"
-                        >
-                          ・{tone}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 <div className="rounded-3xl border-4 border-[#2B8BAA] bg-[#F3FFFC]/80 px-5 py-5 shadow-[6px_6px_0_rgba(43,139,170,0.25)]">
                   <pre className="whitespace-pre-wrap text-left text-sm leading-8 tracking-wider text-[#5F4B7A]">
                     {songPrompt}
@@ -731,7 +710,7 @@ export default function ZzzApp() {
                 {promptSources.length > 0 && (
                   <div className="mt-6 rounded-3xl border-4 border-[#9CCC72] bg-[#F3FFFC]/70 px-4 py-4 text-left shadow-[5px_5px_0_rgba(156,204,114,0.35)]">
                     <p className="mb-3 text-[10px] tracking-widest text-[#2B8BAA]">
-                      使われたうとうと
+                      歌詞に使ってほしい素材フレーズ
                     </p>
 
                     <div className="space-y-2">
