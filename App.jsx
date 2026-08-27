@@ -34,6 +34,99 @@ const getPostDayKey = () => {
   return `${year}-${month}-${day}`;
 };
 
+const pickRandomItems = (items, count) => {
+  const copied = [...items];
+
+  for (let i = copied.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copied[i], copied[j]] = [copied[j], copied[i]];
+  }
+
+  return copied.slice(0, count);
+};
+
+const buildFuzzzyPoem = (phrases) => {
+  const fallbackPhrases = [
+    '忘れてもいいこと',
+    '眠くても残したいこと',
+    'まだ少し起きてる',
+    '夜の棚にあるもの',
+    '誰かの小さな気配'
+  ];
+
+  const lines = phrases.length > 0 ? phrases : fallbackPhrases;
+
+  const line = (index) => lines[index % lines.length];
+
+  const titles = [
+    'FUZZZY MARKET のねごと',
+    '夜の棚に残ったうとうと',
+    'まだ閉店しない夢',
+    'まどろみ売り場',
+    'zが聞こえるところ'
+  ];
+
+  const title = titles[Math.floor(Math.random() * titles.length)];
+
+  const patterns = [
+    `${title}
+
+${line(0)}
+夜の棚に置いたまま
+
+${line(1)}
+少しだけ光っている
+
+誰かの z が
+ひとつ、ふたつ、みっつ
+
+${line(2)}
+眠る前の市場で
+
+売れ残った夢だけが
+まだ起きている`,
+
+    `${title}
+
+${line(0)}
+と書かれた札が
+深夜のレジ横にある
+
+${line(1)}
+${line(2)}
+
+忘れてもいいものほど
+やわらかく光る
+
+誰かが z を置いていく
+また誰かが z を置いていく
+
+まどろみは
+閉店しない`,
+
+    `${title}
+
+眠る前に
+${line(0)}
+
+名前のない気配が
+${line(1)}
+
+コンビニの明かりみたいに
+ぼんやり残って
+
+${line(2)}
+${line(3)}
+
+zzz
+
+朝になったら
+忘れてもいい`
+  ];
+
+  return patterns[Math.floor(Math.random() * patterns.length)];
+};
+
 export default function ZzzApp() {
   const [page, setPage] = useState('timeline');
   const [timeline, setTimeline] = useState([]);
@@ -44,6 +137,10 @@ export default function ZzzApp() {
   const [zzzedPostIds, setZzzedPostIds] = useState([]);
   const [showNegotoModal, setShowNegotoModal] = useState(false);
   const [closeMessage, setCloseMessage] = useState('');
+  const [showPoemModal, setShowPoemModal] = useState(false);
+  const [poem, setPoem] = useState('');
+  const [poemLoading, setPoemLoading] = useState(false);
+  const [poemSources, setPoemSources] = useState([]);
 
   const [utoutoPlaceholder] = useState(() => {
     return UTOUTO_PLACEHOLDERS[
@@ -215,6 +312,34 @@ export default function ZzzApp() {
       console.error(error);
       window.prompt('このURLをコピーしてください', shareUrl);
     }
+  };
+
+  const handleGeneratePoem = async () => {
+    setShowPoemModal(true);
+    setPoemLoading(true);
+    setPoem('');
+    setPoemSources([]);
+
+    const { data, error } = await supabase
+      .from('posts')
+      .select('text, is_hidden, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      console.error(error);
+      setPoem('うまく詩を拾えませんでした。\n少し時間をおいて、もう一度ためしてください。');
+      setPoemLoading(false);
+      return;
+    }
+
+    const posts = (data || []).filter((post) => post.text && post.text.trim());
+    const pickedPosts = pickRandomItems(posts, Math.min(posts.length, 6));
+    const pickedPhrases = pickedPosts.map((post) => post.text.trim());
+
+    setPoemSources(pickedPhrases);
+    setPoem(buildFuzzzyPoem(pickedPhrases));
+    setPoemLoading(false);
   };
 
   const handleSleepClose = () => {
@@ -519,6 +644,14 @@ export default function ZzzApp() {
 
           <button
             type="button"
+            onClick={handleGeneratePoem}
+            className="w-full rounded-full border border-[#D9C7FF]/70 bg-[#EBDFFF]/10 px-4 py-3 text-[11px] tracking-widest text-[#F7F0FF] transition-all hover:border-[#FFF0A8] hover:text-[#FFF0A8] hover:shadow-[0_0_18px_rgba(217,199,255,0.3)]"
+          >
+            ねごとを詩にする
+          </button>
+
+          <button
+            type="button"
             onClick={() => {
               setCloseMessage('');
               setShowNegotoModal(true);
@@ -539,6 +672,71 @@ export default function ZzzApp() {
           </div>
         </footer>
       </div>
+
+      {showPoemModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050711]/85 px-5 py-8 backdrop-blur-md">
+          <div className="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-[2rem] border border-[#D9C7FF]/70 bg-[#10162A]/95 px-6 py-7 text-center shadow-[0_0_50px_rgba(217,199,255,0.25)]">
+            <p className="mb-5 text-xs tracking-[0.4em] text-[#FFF0A8]">
+              FUZZZY POEM
+            </p>
+
+            <img
+              src="/fuzzzy-market.png"
+              alt="FUZZZY MARKET"
+              className="mb-6 w-full rounded-3xl border border-[#4C5678] bg-[#DCEFEA]"
+            />
+
+            {poemLoading ? (
+              <p className="py-8 text-xs tracking-widest text-[#8FA0C8]">
+                ねごとを集めています...
+              </p>
+            ) : (
+              <>
+                <pre className="whitespace-pre-wrap text-left text-sm leading-8 tracking-wider text-[#F7F0FF] drop-shadow-[0_0_10px_rgba(217,199,255,0.3)]">
+                  {poem}
+                </pre>
+
+                {poemSources.length > 0 && (
+                  <div className="mt-6 rounded-2xl border border-[#4C5678] bg-[#080D1A]/60 px-4 py-4 text-left">
+                    <p className="mb-3 text-[10px] tracking-widest text-[#FFF0A8]">
+                      使われたうとうと
+                    </p>
+
+                    <div className="space-y-2">
+                      {poemSources.map((source, index) => (
+                        <p
+                          key={`${source}-${index}`}
+                          className="text-[11px] leading-5 tracking-wider text-[#8FA0C8]"
+                        >
+                          ・{source}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={handleGeneratePoem}
+                className="rounded-full border border-[#D9C7FF] bg-[#D9C7FF]/10 px-4 py-3 text-[11px] tracking-widest text-[#F4EEFF] transition-all hover:bg-[#D9C7FF]/20"
+              >
+                もう一度
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowPoemModal(false)}
+                className="rounded-full border border-[#4C5678] bg-[#10162A]/70 px-4 py-3 text-[11px] tracking-widest text-[#96A2C8] transition-all hover:border-[#A9D6FF] hover:text-[#DDEEFF]"
+              >
+                とじる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showNegotoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050711]/80 px-5 backdrop-blur-md">
