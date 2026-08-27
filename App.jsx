@@ -20,47 +20,49 @@ const UTOUTO_PLACEHOLDERS = [
   '忘れてもいいこと'
 ];
 
-const FUZZZY_KEYWORDS = [
-  '深夜のレジ',
-  'ミントグリーンの光',
-  '売れ残った夢',
-  '眠たい棚',
-  '誰かのレシート',
-  '閉店しない市場',
-  'バックヤードの月',
-  '蛍光灯の下',
-  'ぬるい缶ジュース',
-  'ポケットの小銭',
-  '忘れもの売り場',
-  '夜のカゴ',
-  'うすいビニール袋',
-  '名前のない気配',
-  'まぶたの裏',
-  '午前2時のチャイム',
-  'やわらかいノイズ',
-  '遠くの自販機',
-  '寝ぐせの天使',
-  '半分だけ起きてる街',
-  'FUZZZY MARKET',
-  'MAKO',
-  'ING',
-  'バイト終わりの星',
-  'まどろみの値札',
-  '夢の在庫',
-  'zの足音',
-  '小さな眠気',
-  '消えかけたメモ',
-  '朝まで残った光',
-  '夜だけ開く売り場',
-  '青白いレジ袋',
-  '眠気のバーコード',
-  '誰にも買われない月',
-  'まどろみのBGM',
-  'レシートの裏の詩',
-  '眠る前の在庫確認',
-  'ふたりだけの閉店作業',
-  '夢を並べる台車',
-  '少し光る忘れもの'
+const FUZZZY_TONES = [
+  [
+    '深夜',
+    'まどろみ',
+    '少し不思議',
+    'やさしいけど少しさみしい',
+    'ミントグリーンの光'
+  ],
+  [
+    '閉店後のマーケット',
+    '売れ残った夢',
+    '眠たいポップソング',
+    '少しチープ',
+    'でも妙に泣ける'
+  ],
+  [
+    'コンビニの明かり',
+    '匿名の気配',
+    '忘れてもいい記憶',
+    '小さな孤独',
+    'ゆっくり光る夜'
+  ],
+  [
+    'バイト終わり',
+    'バックヤード',
+    '変な商品棚',
+    '眠気の中のユーモア',
+    'ちょっとへんでかわいい'
+  ],
+  [
+    '夢の在庫処分',
+    'レシートの裏',
+    '午前2時',
+    'ふたりだけの店内放送',
+    'ぼんやりした希望'
+  ],
+  [
+    '夜だけ開く売り場',
+    '誰にも買われない月',
+    '眠気のバーコード',
+    'まどろみのBGM',
+    '朝まで残った光'
+  ]
 ];
 
 const getPostDayKey = () => {
@@ -88,7 +90,7 @@ const pickRandomItems = (items, count) => {
   return copied.slice(0, count);
 };
 
-const buildFuzzzyPoem = (phrases) => {
+const buildSongPrompt = (phrases, tones) => {
   const fallbackPhrases = [
     '忘れてもいいこと',
     '眠くても残したいこと',
@@ -97,168 +99,25 @@ const buildFuzzzyPoem = (phrases) => {
     '誰かの小さな気配'
   ];
 
-  const pickedKeywords = pickRandomItems(FUZZZY_KEYWORDS, 8);
-  const lines = phrases.length > 0 ? phrases : fallbackPhrases;
-  const materials = [...lines, ...pickedKeywords];
+  const sourcePhrases = phrases.length > 0 ? phrases : fallbackPhrases;
 
-  const line = (index) => materials[index % materials.length];
+  return `以下の短いフレーズを素材にして、
+FUZZZY MARKETという架空の夜のマーケットに合う歌詞、または曲のアイデアを作ってください。
 
-  const titles = [
-    'MAKO&ING のうとうとソング',
-    'FUZZZY MARKET のねごと',
-    '夜の棚に残ったうとうと',
-    'まだ閉店しない夢',
-    'まどろみ売り場',
-    'zが聞こえるところ',
-    'ミントグリーンの閉店後',
-    '眠気のバーコード',
-    'レシートの裏の子守唄',
-    '朝まで残った光'
-  ];
+今回のトーン：
+${tones.map((tone) => `・${tone}`).join('\n')}
 
-  const title = titles[Math.floor(Math.random() * titles.length)];
+使ううとうと：
+${sourcePhrases.map((phrase) => `・${phrase}`).join('\n')}
 
-  const patterns = [
-    `タイトル：${title}
-作詞：MAKO&ING
-
-${line(0)}
-${line(1)}
-
-${line(2)}に
-${line(3)}を置いたまま
-
-MAKOが z を数えて
-INGが夢に値札を貼る
-
-${line(4)}
-少しだけ光っている
-
-誰かの z が
-ひとつ、ふたつ、みっつ
-
-${line(5)}
-眠る前の市場で
-
-売れ残った夜だけが
-まだ起きている`,
-
-    `タイトル：${title}
-作詞：MAKO&ING
-
-${line(0)}
-と書かれた札が
-${line(1)}に揺れている
-
-${line(2)}
-${line(3)}
-
-忘れてもいいものほど
-やわらかく光る
-
-MAKOはレジで眠りかけて
-INGはバックヤードで歌ってる
-
-誰かが z を置いていく
-また誰かが z を置いていく
-
-${line(4)}
-まどろみは
-まだ閉店しない`,
-
-    `タイトル：${title}
-作詞：MAKO&ING
-
-眠る前に
-${line(0)}
-
-名前のない気配が
-${line(1)}
-
-${line(2)}みたいに
-ぼんやり残って
-
-${line(3)}
-${line(4)}
-
-zzz
-
-朝になったら
-忘れてもいい
-
-でも今だけ
-${line(5)}が
-少しだけ歌っている`,
-
-    `タイトル：${title}
-作詞：MAKO&ING
-
-FUZZZY MARKETのすみっこで
-${line(0)}が光る
-
-MAKOは眠たい棚をならべて
-INGは${line(1)}を抱えている
-
-${line(2)}
-${line(3)}
-
-だれにも言わないまま
-zだけが増えていく
-
-ひとつめの z
-ふたつめの z
-みっつめの z
-
-${line(4)}
-これは夜にだけ開く
-小さな歌`,
-
-    `タイトル：${title}
-作詞：MAKO&ING
-
-${line(0)}
-レシートの裏に書いて
-
-${line(1)}
-ポケットにしまった
-
-FUZZZY MARKETは
-今日も少しだけ眠い
-
-MAKOが笑って
-INGがうなずく
-
-${line(2)}
-${line(3)}
-
-朝になる前に
-この歌だけ
-棚に戻しておく`,
-
-    `タイトル：${title}
-作詞：MAKO&ING
-
-閉店後の明かりの中で
-${line(0)}が残っている
-
-${line(1)}
-${line(2)}
-
-誰かのうとうとは
-値段のない商品みたいで
-
-MAKOはそっと並べる
-INGは小さく歌にする
-
-${line(3)}
-${line(4)}
-
-忘れてもいい
-でも
-今夜だけはここにある`
-  ];
-
-  return patterns[Math.floor(Math.random() * patterns.length)];
+条件：
+・日本語で作ってください
+・タイトルをつけてください
+・歌詞として読める形にしてください
+・短めの曲として成立する構成にしてください
+・素材のフレーズはそのまま使っても、少し変えてもOKです
+・深夜、まどろみ、眠る前の気配を感じる雰囲気にしてください
+・説明ではなく、作品として出力してください`;
 };
 
 export default function ZzzApp() {
@@ -271,10 +130,11 @@ export default function ZzzApp() {
   const [zzzedPostIds, setZzzedPostIds] = useState([]);
   const [showNegotoModal, setShowNegotoModal] = useState(false);
   const [closeMessage, setCloseMessage] = useState('');
-  const [showPoemModal, setShowPoemModal] = useState(false);
-  const [poem, setPoem] = useState('');
-  const [poemLoading, setPoemLoading] = useState(false);
-  const [poemSources, setPoemSources] = useState([]);
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [songPrompt, setSongPrompt] = useState('');
+  const [promptLoading, setPromptLoading] = useState(false);
+  const [promptSources, setPromptSources] = useState([]);
+  const [promptTones, setPromptTones] = useState([]);
 
   const [utoutoPlaceholder] = useState(() => {
     return UTOUTO_PLACEHOLDERS[
@@ -448,11 +308,12 @@ export default function ZzzApp() {
     }
   };
 
-  const handleGeneratePoem = async () => {
-    setShowPoemModal(true);
-    setPoemLoading(true);
-    setPoem('');
-    setPoemSources([]);
+  const handleGeneratePrompt = async () => {
+    setShowPromptModal(true);
+    setPromptLoading(true);
+    setSongPrompt('');
+    setPromptSources([]);
+    setPromptTones([]);
 
     const { data, error } = await supabase
       .from('posts')
@@ -462,18 +323,32 @@ export default function ZzzApp() {
 
     if (error) {
       console.error(error);
-      setPoem('うまく歌を拾えませんでした。\n少し時間をおいて、もう一度ためしてください。');
-      setPoemLoading(false);
+      setSongPrompt('うまく曲の種を拾えませんでした。\n少し時間をおいて、もう一度ためしてください。');
+      setPromptLoading(false);
       return;
     }
 
     const posts = (data || []).filter((post) => post.text && post.text.trim());
-    const pickedPosts = pickRandomItems(posts, Math.min(posts.length, 6));
+    const pickedPosts = pickRandomItems(posts, Math.min(posts.length, 7));
     const pickedPhrases = pickedPosts.map((post) => post.text.trim());
+    const pickedTones = FUZZZY_TONES[
+      Math.floor(Math.random() * FUZZZY_TONES.length)
+    ];
 
-    setPoemSources(pickedPhrases);
-    setPoem(buildFuzzzyPoem(pickedPhrases));
-    setPoemLoading(false);
+    setPromptSources(pickedPhrases);
+    setPromptTones(pickedTones);
+    setSongPrompt(buildSongPrompt(pickedPhrases, pickedTones));
+    setPromptLoading(false);
+  };
+
+  const handleCopyPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(songPrompt);
+      alert('曲の種をコピーしました。');
+    } catch (error) {
+      console.error(error);
+      window.prompt('この曲の種をコピーしてください', songPrompt);
+    }
   };
 
   const handleSleepClose = () => {
@@ -778,10 +653,10 @@ export default function ZzzApp() {
 
           <button
             type="button"
-            onClick={handleGeneratePoem}
+            onClick={handleGeneratePrompt}
             className="w-full rounded-full border border-[#D9C7FF]/70 bg-[#EBDFFF]/10 px-4 py-3 text-[11px] tracking-widest text-[#F7F0FF] transition-all hover:border-[#FFF0A8] hover:text-[#FFF0A8] hover:shadow-[0_0_18px_rgba(217,199,255,0.3)]"
           >
-            MAKO&ING
+            ZZZからあなたへ
           </button>
 
           <button
@@ -807,45 +682,60 @@ export default function ZzzApp() {
         </footer>
       </div>
 
-      {showPoemModal && (
+      {showPromptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#DCEFEA]/90 px-5 py-8 backdrop-blur-sm">
           <div className="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-[2rem] border-4 border-[#2B8BAA] bg-[#DCEFEA] px-6 py-7 text-center shadow-[10px_10px_0_rgba(43,139,170,0.35)]">
-            <p className="mb-3 text-xs tracking-[0.4em] text-[#6B5487]">
-              MAKO&ING
+            <p className="mb-3 text-xs tracking-[0.32em] text-[#6B5487]">
+              ZZZからあなたへ
             </p>
 
             <p className="mb-5 text-xs leading-6 tracking-wider text-[#5F4B7A]">
-              FUZZZY MARKETのバイト店員、MAKOとINGが
+              ZZZが、みんなのうとうとを少しだけ拾って、
               <br />
-              みんなのうとうとを使って歌を作ります。
+              あなたに曲の種を渡します。
+              <br />
+              好きなAIに貼って、歌や歌詞にしてください。
             </p>
 
-            <img
-              src="/fuzzzy-market.png"
-              alt="FUZZZY MARKET"
-              className="mb-6 w-full rounded-3xl border-4 border-[#2B8BAA] bg-[#DCEFEA]"
-            />
-
-            {poemLoading ? (
+            {promptLoading ? (
               <p className="py-8 text-xs tracking-widest text-[#2B8BAA]">
-                うとうとを集めています...
+                曲の種を集めています...
               </p>
             ) : (
               <>
+                {promptTones.length > 0 && (
+                  <div className="mb-5 rounded-3xl border-4 border-[#9CCC72] bg-[#F3FFFC]/70 px-4 py-4 text-left shadow-[5px_5px_0_rgba(156,204,114,0.35)]">
+                    <p className="mb-3 text-[10px] tracking-widest text-[#2B8BAA]">
+                      今回のトーン
+                    </p>
+
+                    <div className="space-y-2">
+                      {promptTones.map((tone, index) => (
+                        <p
+                          key={`${tone}-${index}`}
+                          className="text-[11px] leading-5 tracking-wider text-[#6B5487]"
+                        >
+                          ・{tone}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="rounded-3xl border-4 border-[#2B8BAA] bg-[#F3FFFC]/80 px-5 py-5 shadow-[6px_6px_0_rgba(43,139,170,0.25)]">
                   <pre className="whitespace-pre-wrap text-left text-sm leading-8 tracking-wider text-[#5F4B7A]">
-                    {poem}
+                    {songPrompt}
                   </pre>
                 </div>
 
-                {poemSources.length > 0 && (
+                {promptSources.length > 0 && (
                   <div className="mt-6 rounded-3xl border-4 border-[#9CCC72] bg-[#F3FFFC]/70 px-4 py-4 text-left shadow-[5px_5px_0_rgba(156,204,114,0.35)]">
                     <p className="mb-3 text-[10px] tracking-widest text-[#2B8BAA]">
                       使われたうとうと
                     </p>
 
                     <div className="space-y-2">
-                      {poemSources.map((source, index) => (
+                      {promptSources.map((source, index) => (
                         <p
                           key={`${source}-${index}`}
                           className="text-[11px] leading-5 tracking-wider text-[#6B5487]"
@@ -859,22 +749,33 @@ export default function ZzzApp() {
               </>
             )}
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6 space-y-3">
               <button
                 type="button"
-                onClick={handleGeneratePoem}
-                className="rounded-full border-4 border-[#2B8BAA] bg-[#9CCC72] px-4 py-3 text-[11px] tracking-widest text-[#2B4D5C] shadow-[4px_4px_0_rgba(43,139,170,0.35)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(43,139,170,0.35)]"
+                onClick={handleCopyPrompt}
+                disabled={!songPrompt}
+                className="w-full rounded-full border-4 border-[#2B8BAA] bg-[#9CCC72] px-4 py-3 text-[11px] tracking-widest text-[#2B4D5C] shadow-[4px_4px_0_rgba(43,139,170,0.35)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(43,139,170,0.35)] disabled:opacity-40"
               >
-                もう一度
+                コピーする
               </button>
 
-              <button
-                type="button"
-                onClick={() => setShowPoemModal(false)}
-                className="rounded-full border-4 border-[#6B5487] bg-[#E8D3E8] px-4 py-3 text-[11px] tracking-widest text-[#6B5487] shadow-[4px_4px_0_rgba(107,84,135,0.25)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(107,84,135,0.25)]"
-              >
-                とじる
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={handleGeneratePrompt}
+                  className="rounded-full border-4 border-[#2B8BAA] bg-[#F3FFFC]/80 px-4 py-3 text-[11px] tracking-widest text-[#2B4D5C] shadow-[4px_4px_0_rgba(43,139,170,0.25)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(43,139,170,0.25)]"
+                >
+                  もう一度
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowPromptModal(false)}
+                  className="rounded-full border-4 border-[#6B5487] bg-[#E8D3E8] px-4 py-3 text-[11px] tracking-widest text-[#6B5487] shadow-[4px_4px_0_rgba(107,84,135,0.25)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(107,84,135,0.25)]"
+                >
+                  とじる
+                </button>
+              </div>
             </div>
           </div>
         </div>
