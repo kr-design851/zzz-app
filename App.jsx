@@ -20,6 +20,49 @@ const UTOUTO_PLACEHOLDERS = [
   '忘れてもいいこと'
 ];
 
+const FUZZZY_KEYWORDS = [
+  '深夜のレジ',
+  'ミントグリーンの光',
+  '売れ残った夢',
+  '眠たい棚',
+  '誰かのレシート',
+  '閉店しない市場',
+  'バックヤードの月',
+  '蛍光灯の下',
+  'ぬるい缶ジュース',
+  'ポケットの小銭',
+  '忘れもの売り場',
+  '夜のカゴ',
+  'うすいビニール袋',
+  '名前のない気配',
+  'まぶたの裏',
+  '午前2時のチャイム',
+  'やわらかいノイズ',
+  '遠くの自販機',
+  '寝ぐせの天使',
+  '半分だけ起きてる街',
+  'FUZZZY MARKET',
+  'MAKO',
+  'ING',
+  'バイト終わりの星',
+  'まどろみの値札',
+  '夢の在庫',
+  'zの足音',
+  '小さな眠気',
+  '消えかけたメモ',
+  '朝まで残った光',
+  '夜だけ開く売り場',
+  '青白いレジ袋',
+  '眠気のバーコード',
+  '誰にも買われない月',
+  'まどろみのBGM',
+  'レシートの裏の詩',
+  '眠る前の在庫確認',
+  'ふたりだけの閉店作業',
+  '夢を並べる台車',
+  '少し光る忘れもの'
+];
+
 const getPostDayKey = () => {
   const date = new Date();
 
@@ -54,57 +97,77 @@ const buildFuzzzyPoem = (phrases) => {
     '誰かの小さな気配'
   ];
 
+  const pickedKeywords = pickRandomItems(FUZZZY_KEYWORDS, 8);
   const lines = phrases.length > 0 ? phrases : fallbackPhrases;
+  const materials = [...lines, ...pickedKeywords];
 
-  const line = (index) => lines[index % lines.length];
+  const line = (index) => materials[index % materials.length];
 
   const titles = [
+    'MAKO&ING のうとうとソング',
     'FUZZZY MARKET のねごと',
     '夜の棚に残ったうとうと',
     'まだ閉店しない夢',
     'まどろみ売り場',
-    'zが聞こえるところ'
+    'zが聞こえるところ',
+    'ミントグリーンの閉店後',
+    '眠気のバーコード',
+    'レシートの裏の子守唄',
+    '朝まで残った光'
   ];
 
   const title = titles[Math.floor(Math.random() * titles.length)];
 
   const patterns = [
-    `${title}
+    `タイトル：${title}
+作詞：MAKO&ING
 
 ${line(0)}
-夜の棚に置いたまま
-
 ${line(1)}
+
+${line(2)}に
+${line(3)}を置いたまま
+
+MAKOが z を数えて
+INGが夢に値札を貼る
+
+${line(4)}
 少しだけ光っている
 
 誰かの z が
 ひとつ、ふたつ、みっつ
 
-${line(2)}
+${line(5)}
 眠る前の市場で
 
-売れ残った夢だけが
+売れ残った夜だけが
 まだ起きている`,
 
-    `${title}
+    `タイトル：${title}
+作詞：MAKO&ING
 
 ${line(0)}
 と書かれた札が
-深夜のレジ横にある
+${line(1)}に揺れている
 
-${line(1)}
 ${line(2)}
+${line(3)}
 
 忘れてもいいものほど
 やわらかく光る
 
+MAKOはレジで眠りかけて
+INGはバックヤードで歌ってる
+
 誰かが z を置いていく
 また誰かが z を置いていく
 
+${line(4)}
 まどろみは
-閉店しない`,
+まだ閉店しない`,
 
-    `${title}
+    `タイトル：${title}
+作詞：MAKO&ING
 
 眠る前に
 ${line(0)}
@@ -112,16 +175,87 @@ ${line(0)}
 名前のない気配が
 ${line(1)}
 
-コンビニの明かりみたいに
+${line(2)}みたいに
 ぼんやり残って
 
-${line(2)}
 ${line(3)}
+${line(4)}
 
 zzz
 
 朝になったら
-忘れてもいい`
+忘れてもいい
+
+でも今だけ
+${line(5)}が
+少しだけ歌っている`,
+
+    `タイトル：${title}
+作詞：MAKO&ING
+
+FUZZZY MARKETのすみっこで
+${line(0)}が光る
+
+MAKOは眠たい棚をならべて
+INGは${line(1)}を抱えている
+
+${line(2)}
+${line(3)}
+
+だれにも言わないまま
+zだけが増えていく
+
+ひとつめの z
+ふたつめの z
+みっつめの z
+
+${line(4)}
+これは夜にだけ開く
+小さな歌`,
+
+    `タイトル：${title}
+作詞：MAKO&ING
+
+${line(0)}
+レシートの裏に書いて
+
+${line(1)}
+ポケットにしまった
+
+FUZZZY MARKETは
+今日も少しだけ眠い
+
+MAKOが笑って
+INGがうなずく
+
+${line(2)}
+${line(3)}
+
+朝になる前に
+この歌だけ
+棚に戻しておく`,
+
+    `タイトル：${title}
+作詞：MAKO&ING
+
+閉店後の明かりの中で
+${line(0)}が残っている
+
+${line(1)}
+${line(2)}
+
+誰かのうとうとは
+値段のない商品みたいで
+
+MAKOはそっと並べる
+INGは小さく歌にする
+
+${line(3)}
+${line(4)}
+
+忘れてもいい
+でも
+今夜だけはここにある`
   ];
 
   return patterns[Math.floor(Math.random() * patterns.length)];
@@ -328,7 +462,7 @@ export default function ZzzApp() {
 
     if (error) {
       console.error(error);
-      setPoem('うまく詩を拾えませんでした。\n少し時間をおいて、もう一度ためしてください。');
+      setPoem('うまく歌を拾えませんでした。\n少し時間をおいて、もう一度ためしてください。');
       setPoemLoading(false);
       return;
     }
@@ -647,7 +781,7 @@ export default function ZzzApp() {
             onClick={handleGeneratePoem}
             className="w-full rounded-full border border-[#D9C7FF]/70 bg-[#EBDFFF]/10 px-4 py-3 text-[11px] tracking-widest text-[#F7F0FF] transition-all hover:border-[#FFF0A8] hover:text-[#FFF0A8] hover:shadow-[0_0_18px_rgba(217,199,255,0.3)]"
           >
-            うとうとを詩にする
+            MAKO&ING
           </button>
 
           <button
@@ -676,8 +810,14 @@ export default function ZzzApp() {
       {showPoemModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#DCEFEA]/90 px-5 py-8 backdrop-blur-sm">
           <div className="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-[2rem] border-4 border-[#2B8BAA] bg-[#DCEFEA] px-6 py-7 text-center shadow-[10px_10px_0_rgba(43,139,170,0.35)]">
-            <p className="mb-5 text-xs tracking-[0.4em] text-[#6B5487]">
-              FUZZZY POEM
+            <p className="mb-3 text-xs tracking-[0.4em] text-[#6B5487]">
+              MAKO&ING
+            </p>
+
+            <p className="mb-5 text-xs leading-6 tracking-wider text-[#5F4B7A]">
+              FUZZZY MARKETのバイト店員、MAKOとINGが
+              <br />
+              みんなのうとうとを使って歌を作ります。
             </p>
 
             <img
@@ -688,7 +828,7 @@ export default function ZzzApp() {
 
             {poemLoading ? (
               <p className="py-8 text-xs tracking-widest text-[#2B8BAA]">
-                ねごとを集めています...
+                うとうとを集めています...
               </p>
             ) : (
               <>
