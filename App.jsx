@@ -647,7 +647,7 @@ export default function ZzzApp() {
             onClick={handleGeneratePoem}
             className="w-full rounded-full border border-[#D9C7FF]/70 bg-[#EBDFFF]/10 px-4 py-3 text-[11px] tracking-widest text-[#F7F0FF] transition-all hover:border-[#FFF0A8] hover:text-[#FFF0A8] hover:shadow-[0_0_18px_rgba(217,199,255,0.3)]"
           >
-            ねごとを詩にする
+            うとうとを詩にする
           </button>
 
           <button
