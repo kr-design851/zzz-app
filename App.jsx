@@ -674,31 +674,33 @@ export default function ZzzApp() {
       </div>
 
       {showPoemModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050711]/85 px-5 py-8 backdrop-blur-md">
-          <div className="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-[2rem] border border-[#D9C7FF]/70 bg-[#10162A]/95 px-6 py-7 text-center shadow-[0_0_50px_rgba(217,199,255,0.25)]">
-            <p className="mb-5 text-xs tracking-[0.4em] text-[#FFF0A8]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#DCEFEA]/90 px-5 py-8 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-[2rem] border-4 border-[#2B8BAA] bg-[#DCEFEA] px-6 py-7 text-center shadow-[10px_10px_0_rgba(43,139,170,0.35)]">
+            <p className="mb-5 text-xs tracking-[0.4em] text-[#6B5487]">
               FUZZZY POEM
             </p>
 
             <img
               src="/fuzzzy-market.png"
               alt="FUZZZY MARKET"
-              className="mb-6 w-full rounded-3xl border border-[#4C5678] bg-[#DCEFEA]"
+              className="mb-6 w-full rounded-3xl border-4 border-[#2B8BAA] bg-[#DCEFEA]"
             />
 
             {poemLoading ? (
-              <p className="py-8 text-xs tracking-widest text-[#8FA0C8]">
+              <p className="py-8 text-xs tracking-widest text-[#2B8BAA]">
                 ねごとを集めています...
               </p>
             ) : (
               <>
-                <pre className="whitespace-pre-wrap text-left text-sm leading-8 tracking-wider text-[#F7F0FF] drop-shadow-[0_0_10px_rgba(217,199,255,0.3)]">
-                  {poem}
-                </pre>
+                <div className="rounded-3xl border-4 border-[#2B8BAA] bg-[#F3FFFC]/80 px-5 py-5 shadow-[6px_6px_0_rgba(43,139,170,0.25)]">
+                  <pre className="whitespace-pre-wrap text-left text-sm leading-8 tracking-wider text-[#5F4B7A]">
+                    {poem}
+                  </pre>
+                </div>
 
                 {poemSources.length > 0 && (
-                  <div className="mt-6 rounded-2xl border border-[#4C5678] bg-[#080D1A]/60 px-4 py-4 text-left">
-                    <p className="mb-3 text-[10px] tracking-widest text-[#FFF0A8]">
+                  <div className="mt-6 rounded-3xl border-4 border-[#9CCC72] bg-[#F3FFFC]/70 px-4 py-4 text-left shadow-[5px_5px_0_rgba(156,204,114,0.35)]">
+                    <p className="mb-3 text-[10px] tracking-widest text-[#2B8BAA]">
                       使われたうとうと
                     </p>
 
@@ -706,7 +708,7 @@ export default function ZzzApp() {
                       {poemSources.map((source, index) => (
                         <p
                           key={`${source}-${index}`}
-                          className="text-[11px] leading-5 tracking-wider text-[#8FA0C8]"
+                          className="text-[11px] leading-5 tracking-wider text-[#6B5487]"
                         >
                           ・{source}
                         </p>
@@ -721,7 +723,7 @@ export default function ZzzApp() {
               <button
                 type="button"
                 onClick={handleGeneratePoem}
-                className="rounded-full border border-[#D9C7FF] bg-[#D9C7FF]/10 px-4 py-3 text-[11px] tracking-widest text-[#F4EEFF] transition-all hover:bg-[#D9C7FF]/20"
+                className="rounded-full border-4 border-[#2B8BAA] bg-[#9CCC72] px-4 py-3 text-[11px] tracking-widest text-[#2B4D5C] shadow-[4px_4px_0_rgba(43,139,170,0.35)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(43,139,170,0.35)]"
               >
                 もう一度
               </button>
@@ -729,7 +731,7 @@ export default function ZzzApp() {
               <button
                 type="button"
                 onClick={() => setShowPoemModal(false)}
-                className="rounded-full border border-[#4C5678] bg-[#10162A]/70 px-4 py-3 text-[11px] tracking-widest text-[#96A2C8] transition-all hover:border-[#A9D6FF] hover:text-[#DDEEFF]"
+                className="rounded-full border-4 border-[#6B5487] bg-[#E8D3E8] px-4 py-3 text-[11px] tracking-widest text-[#6B5487] shadow-[4px_4px_0_rgba(107,84,135,0.25)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_rgba(107,84,135,0.25)]"
               >
                 とじる
               </button>
